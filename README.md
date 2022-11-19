@@ -3,25 +3,25 @@
 ## Development
 
 ```sh
-docker compose up -f docker-compose-dev.yml
+docker compose -f docker-compose-dev.yml up
 ```
 
 For debug
 
 ```sh
-docker compose up -f docker-compose-dev.yml --profile debug
+docker compose -f docker-compose-dev.yml --profile debug up
 ```
 
 With Frontend
 
 ```sh
-docker compose up -f docker-compose-dev.yml --profile frontend
+docker compose -f docker-compose-dev.yml --profile frontend up
 ```
 
 ## Production
 
 ```sh
-docker compose up -f docker-compose.yml
+docker compose -f docker-compose.yml up
 ```
 
 ## NOTE
