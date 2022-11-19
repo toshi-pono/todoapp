@@ -23,3 +23,10 @@ docker compose up -f docker-compose-dev.yml --profile frontend
 ```sh
 docker compose up -f docker-compose.yml
 ```
+
+## NOTE
+
+```
+cd server
+go generate ./handler/api.go
+```
