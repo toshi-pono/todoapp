@@ -6,7 +6,9 @@ require (
 	github.com/deepmap/oapi-codegen v1.12.2
 	github.com/getkin/kin-openapi v0.108.0
 	github.com/gin-gonic/gin v1.8.1
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/uuid v1.3.0
+	github.com/jmoiron/sqlx v1.3.5
 )
 
 require (
