@@ -62,7 +62,8 @@ func (repo *SqlxRepository) SearchTasks(limit int, offset int, query SearchTaskA
 
 // CreateTask タスクを作成する
 func (repo *SqlxRepository) CreateTask(args CreateTaskArgs) error {
-	_, err := repo.db.Exec("INSERT INTO tasks (title, description) VALUES (?, ?)", args.Title, args.Description)
+	id := uuid.New()
+	_, err := repo.db.Exec("INSERT INTO tasks (id, title, description) VALUES (?, ?, ?)", id, args.Title, args.Description)
 	if err != nil {
 		return err
 	}
