@@ -1,13 +1,17 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/toshi-pono/todoapp/server/handler/openapi"
 )
 
 // タスクを取得
 // (GET /tasks)
-func (h *Handlers) GetTasks(c *gin.Context, params openapi.GetTasksParams) {}
+func (h *Handlers) GetTasks(c *gin.Context, params openapi.GetTasksParams) {
+	c.JSON(http.StatusOK, openapi.Task{})
+}
 
 // タスクを作成
 // (POST /tasks)

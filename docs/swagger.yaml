@@ -11,6 +11,8 @@ paths:
     get:
       summary: タスクを取得
       description: タスクを取得します
+      security:
+        - cookieAuth: []
       responses:
         200:
           description: OK
@@ -34,6 +36,8 @@ paths:
     post:
       summary: タスクを作成
       description: タスクを作成します
+      security:
+        - cookieAuth: []
       responses:
         201:
           description: Created
@@ -56,6 +60,8 @@ paths:
     get:
       summary: タスクを取得
       description: タスクを1件取得します
+      security:
+        - cookieAuth: []
       responses:
         200:
           description: OK
@@ -73,6 +79,8 @@ paths:
     patch:
       summary: タスクを更新
       description: タスクを更新します
+      security:
+        - cookieAuth: []
       responses:
         200:
           description: OK
@@ -98,6 +106,8 @@ paths:
     delete:
       summary: タスクを削除
       description: タスクを削除します
+      security:
+        - cookieAuth: []
       responses:
         204:
           description: No Content
@@ -114,6 +124,8 @@ paths:
     get:
       summary: ログインユーザーを取得
       description: ログインユーザーを取得します
+      security:
+        - cookieAuth: []
       responses:
         200:
           description: OK
@@ -129,6 +141,8 @@ paths:
     patch:
       summary: ログインユーザーを更新
       description: ログインユーザーを更新します
+      security:
+        - cookieAuth: []
       responses:
         200:
           description: OK
@@ -195,6 +209,8 @@ paths:
     post:
       summary: ログアウト
       description: ログアウトします
+      security:
+        - cookieAuth: []
       responses:
         204:
           description: No Content ログアウトしました
@@ -204,6 +220,12 @@ paths:
       tags:
         - auth
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Loginに使用するCookie
   schemas:
     Task:
       title: Task
