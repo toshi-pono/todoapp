@@ -1,16 +1,23 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type UsersRepository interface {
 	GetUser(userId uuid.UUID) (*User, error)
+	GetUserByName(name string) (*User, error)
 	CreateUser(args CreateUserArgs) error
 }
 
 type User struct {
-	Id       uuid.UUID `json:"id"`
-	Name     string    `db:"name"`
-	Password []byte    `db:"password"`
+	Id        uuid.UUID `json:"id"`
+	Name      string    `db:"name"`
+	Password  []byte    `db:"password"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 type CreateUserArgs struct {
@@ -23,6 +30,15 @@ type CreateUserArgs struct {
 func (repo *SqlxRepository) GetUser(userId uuid.UUID) (*User, error) {
 	var user User
 	err := repo.db.Get(&user, "SELECT * FROM users WHERE id = ?", userId)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (repo *SqlxRepository) GetUserByName(name string) (*User, error) {
+	var user User
+	err := repo.db.Get(&user, "SELECT * FROM users WHERE name = ?", name)
 	if err != nil {
 		return nil, err
 	}

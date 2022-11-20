@@ -7,6 +7,7 @@ import (
 
 	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/labstack/gommon/log"
 )
@@ -39,5 +40,8 @@ func Authenticate(ctx context.Context, input *openapi3filter.AuthenticationInput
 }
 
 func CheckLogin(ctx *gin.Context) (bool, string, error) {
+	if sessions.Default(ctx).Get(userKey) != nil {
+		return true, "", nil
+	}
 	return false, "not login", nil
 }

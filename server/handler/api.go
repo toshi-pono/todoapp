@@ -6,6 +6,8 @@ import (
 
 	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/toshi-pono/todoapp/server/handler/openapi"
 	"github.com/toshi-pono/todoapp/server/model"
@@ -34,6 +36,8 @@ func NewGinServer(handlers *Handlers) *gin.Engine {
 
 	// Create a basic Gin router
 	r := gin.Default()
+	store := cookie.NewStore([]byte("secret"))
+	r.Use(sessions.Sessions("mysession", store))
 
 	// Add the middleware
 	r.Use(middleware.OapiRequestValidatorWithOptions(swagger, &middleware.Options{
