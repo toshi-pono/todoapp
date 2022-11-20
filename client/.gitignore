@@ -24,3 +24,4 @@ gitignore
 Thumbs.db
 
 .eslintcache
+src/utils/apis/generated
