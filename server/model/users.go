@@ -14,6 +14,7 @@ type User struct {
 }
 
 type CreateUserArgs struct {
+	Id       uuid.UUID
 	Name     string
 	Password []byte
 }
@@ -30,8 +31,7 @@ func (repo *SqlxRepository) GetUser(userId uuid.UUID) (*User, error) {
 
 // CreateUser ユーザーを作成する
 func (repo *SqlxRepository) CreateUser(args CreateUserArgs) error {
-	id := uuid.New()
-	_, err := repo.db.Exec("INSERT INTO users (id, name, password) VALUES (?, ?, ?)", id, args.Name, args.Password)
+	_, err := repo.db.Exec("INSERT INTO users (id, name, password) VALUES (?, ?, ?)", args.Id, args.Name, args.Password)
 	if err != nil {
 		return err
 	}

@@ -15,12 +15,12 @@ import (
 //go:generate go fmt ./openapi/openapi.gen.go
 
 type Handlers struct {
-	Repo *model.Repository
+	Repo model.Repository
 }
 
 func NewHandlers(repo model.Repository) *Handlers {
 	return &Handlers{
-		Repo: &repo,
+		Repo: repo,
 	}
 }
 
