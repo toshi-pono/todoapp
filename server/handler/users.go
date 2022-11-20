@@ -27,7 +27,7 @@ func (h *Handlers) CreateUser(c *gin.Context) {
 		Password: util.HashPassword(createUserArgs.Password),
 	})
 	var mysqlError *mysql.MySQLError
-	if errors.As(err, &mysqlError) && mysqlError.Number == 1062 {
+	if errors.As(err, &mysqlError) && mysqlError.Number == model.ErrDuplicateKey {
 		c.Status(http.StatusConflict)
 		return
 	} else if err != nil {
