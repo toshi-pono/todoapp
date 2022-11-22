@@ -192,6 +192,11 @@ paths:
       responses:
         204:
           description: No Content ログインしました
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: cookie
         400:
           description: Bad Request
         401:

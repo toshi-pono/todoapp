@@ -37,7 +37,7 @@ func NewGinServer(handlers *Handlers) *gin.Engine {
 	// Create a basic Gin router
 	r := gin.Default()
 	store := cookie.NewStore([]byte("secret"))
-	r.Use(sessions.Sessions("mysession", store))
+	r.Use(sessions.Sessions("session", store))
 
 	// Add the middleware
 	r.Use(middleware.OapiRequestValidatorWithOptions(swagger, &middleware.Options{

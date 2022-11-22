@@ -40,7 +40,7 @@ func (h *Handlers) Login(c *gin.Context) {
 	}
 
 	session := sessions.Default(c)
-	session.Set(userKey, user.Id)
+	session.Set(userKey, user.Id.String())
 	session.Save()
 
 	c.Status(http.StatusNoContent)
