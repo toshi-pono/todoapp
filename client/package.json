@@ -18,11 +18,14 @@
     "postinstall": "npm run gen-api"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.4.1",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "axios": "^1.2.0",
+    "framer-motion": "^7.6.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ress": "^5.0.2",
-    "sass": "^1.56.1"
+    "swr": "^1.3.0"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.5.2",
