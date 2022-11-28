@@ -52,7 +52,7 @@ func (h *Handlers) Login(c *gin.Context) {
 func (h *Handlers) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
-	session.Options(sessions.Options{MaxAge: -1})
+	session.Options(sessions.Options{MaxAge: -1, Path: "/"})
 	session.Save()
 	c.Status(http.StatusNoContent)
 }
