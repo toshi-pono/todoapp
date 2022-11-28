@@ -1,7 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useNavigate } from 'react-router'
 import {
   Heading,
   Input,
@@ -13,16 +12,19 @@ import {
   InputRightElement,
   Link as ChakraLink,
 } from '@chakra-ui/react'
+import { useNavigate } from 'react-router'
 
 import PageContainer from '/@/components/layouts/PageContainer'
 import { useAuth } from '/@/libs/auth'
+
+import api from '../libs/apis'
 
 interface FormValues {
   username: string
   password: string
 }
 
-const Login = () => {
+const Register = () => {
   const { login, isLogout, user } = useAuth()
   const navigate = useNavigate()
 
@@ -35,24 +37,34 @@ const Login = () => {
   const [show, setShow] = useState(false)
   const handlePasswordShow = useCallback(() => setShow(!show), [show])
 
-  const [loginForm, setLoginForm] = useState<FormValues>({
+  const [registerForm, setRegisterForm] = useState<FormValues>({
     username: '',
     password: '',
   })
   const handleFormChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target
-      setLoginForm({ ...loginForm, [name]: value })
+      setRegisterForm((prev) => ({ ...prev, [name]: value }))
     },
-    [loginForm]
+    []
   )
 
-  const handleLogin = useCallback(async () => {
-    await login(loginForm.username, loginForm.password)
-  }, [login, loginForm.password, loginForm.username])
+  const handleRegister = useCallback(async () => {
+    try {
+      const res = await api.users.createUser({
+        name: registerForm.username,
+        password: registerForm.password,
+      })
+      if (res.status === 201) {
+        navigate('/login')
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }, [navigate, registerForm.password, registerForm.username])
   return (
     <PageContainer>
-      <Heading>Login</Heading>
+      <Heading>Register</Heading>
       <Stack spacing={4}>
         <FormControl isRequired>
           <FormLabel>ユーザー名</FormLabel>
@@ -61,7 +73,7 @@ const Login = () => {
               name="username"
               onChange={handleFormChange}
               placeholder="Username"
-              value={loginForm.username}
+              value={registerForm.username}
             />
           </InputGroup>
         </FormControl>
@@ -73,7 +85,7 @@ const Login = () => {
               onChange={handleFormChange}
               placeholder="Password"
               type={show ? 'text' : 'password'}
-              value={loginForm.password}
+              value={registerForm.password}
             />
             <InputRightElement width="4.5rem">
               <Button h="1.75rem" onClick={handlePasswordShow} size="sm">
@@ -83,14 +95,14 @@ const Login = () => {
           </InputGroup>
         </FormControl>
         <FormControl>
-          <Button onClick={handleLogin}>ログイン</Button>
+          <Button onClick={handleRegister}>新規登録</Button>
         </FormControl>
-        <ChakraLink as={Link} color="teal.500" to="/register">
-          アカウントを新規作成する
+        <ChakraLink as={Link} color="teal.500" to="/login">
+          アカウントをお持ちの方はこちら
         </ChakraLink>
       </Stack>
     </PageContainer>
   )
 }
 
-export default Login
+export default Register
