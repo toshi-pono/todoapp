@@ -11,7 +11,9 @@ import {
   FormLabel,
   InputRightElement,
   Link as ChakraLink,
+  useToast,
 } from '@chakra-ui/react'
+import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
 
 import PageContainer from '/@/components/layouts/PageContainer'
@@ -27,6 +29,7 @@ interface FormValues {
 const Register = () => {
   const { isLogout, user } = useAuth()
   const navigate = useNavigate()
+  const toast = useToast()
 
   useEffect(() => {
     if (user && !isLogout) {
@@ -59,9 +62,26 @@ const Register = () => {
         navigate('/login')
       }
     } catch (e) {
-      console.log(e)
+      if ((e as AxiosError).response?.status === 409) {
+        toast({
+          title: 'アカウントを作成できませんでした',
+          description: 'ユーザー名が既に存在しています',
+          status: 'error',
+          duration: 6000,
+          isClosable: true,
+        })
+      } else {
+        toast({
+          title: 'アカウントを作成できませんでした',
+          description: 'エラーが発生しました',
+          status: 'error',
+          duration: 6000,
+          isClosable: true,
+        })
+      }
     }
-  }, [navigate, registerForm.password, registerForm.username])
+  }, [navigate, registerForm.password, registerForm.username, toast])
+
   return (
     <PageContainer>
       <Heading>Register</Heading>

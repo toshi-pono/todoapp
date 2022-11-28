@@ -9,6 +9,7 @@ import {
   InputRightElement,
   Divider,
   Stack,
+  useToast,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useSWRConfig } from 'swr'
@@ -24,6 +25,7 @@ interface PasswordEditForm {
 const UserEdit = () => {
   const { user } = useAuth()
   const { mutate } = useSWRConfig()
+  const toast = useToast()
 
   const [passwordForm, setPasswordForm] = useState<PasswordEditForm>({
     password: '',
@@ -53,27 +55,58 @@ const UserEdit = () => {
   }, [])
 
   const handleUpdateName = useCallback(async () => {
-    const res = await api.users.updateMe({ name: nameForm })
-    if (res.status === 200) {
-      mutate('/users/me')
-      // TODO: alertをかっこよくする
-      alert('ユーザー名を更新しました')
+    try {
+      const res = await api.users.updateMe({ name: nameForm })
+      if (res.status === 200) {
+        mutate('/users/me')
+        toast({
+          title: 'ユーザー名を更新しました',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
+    } catch (e) {
+      const err = e as AxiosError
+      if (err.response?.status === 409) {
+        toast({
+          title: 'ユーザー名が重複しています',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      } else {
+        toast({
+          title: 'ユーザー名の更新に失敗しました',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
     }
-  }, [nameForm, mutate])
+  }, [nameForm, mutate, toast])
 
   const handleUpdatePassword = useCallback(async () => {
     try {
       const res = await api.users.updatePassword(passwordForm)
       if (res.status === 200) {
         mutate('/users/me')
-        // TODO: alertをかっこよくする
-        alert('パスワードを更新しました')
+        toast({
+          title: 'パスワードを更新しました',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
       }
     } catch (e) {
       const error = e as AxiosError
       if (error.response?.status === 403) {
-        // TODO: alertをかっこよくする
-        alert('パスワードが間違っています')
+        toast({
+          title: 'パスワードが間違っています',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
       } else {
         throw e
       }
