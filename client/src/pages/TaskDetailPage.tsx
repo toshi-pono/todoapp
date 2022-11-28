@@ -11,18 +11,24 @@ import {
   Checkbox,
   Breadcrumb,
   BreadcrumbItem,
+  AvatarGroup,
+  Avatar,
+  Divider,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
-import api, { Task, UpdateTaskRequest } from '/@/libs/apis'
+import api, { TaskDetail, UpdateTaskRequest } from '/@/libs/apis'
 import PageContainer from '/@/components/layouts/PageContainer'
+import { useAuth } from '/@/libs/auth'
 
-const TaskDetail = () => {
+const TaskDetailPage = () => {
+  const { user } = useAuth()
   const { taskId } = useParams<{ taskId: string }>()
   const fetcher = (_: string, id: string) =>
     api.tasks.getTask(id).then((res) => res.data)
-  const { data: task, mutate } = useSWR<Task, AxiosError>(
+  const { data: task, mutate } = useSWR<TaskDetail, AxiosError>(
     ['/tasks/', taskId],
     fetcher
   )
@@ -50,6 +56,37 @@ const TaskDetail = () => {
     },
     []
   )
+
+  const [shareUser, setShareUser] = useState('')
+  const [shareErrorMessage, setShareErrorMessage] = useState('')
+  const handleShareUserChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setShareUser(e.target.value)
+    },
+    []
+  )
+  const handleShare = useCallback(async () => {
+    if (taskId === undefined || shareUser === '') return
+    try {
+      const res = await api.tasks.shareTask(taskId, {
+        name: shareUser,
+      })
+      if (res.status === 204) {
+        setShareUser('')
+        setShareErrorMessage('')
+        mutate()
+      }
+    } catch (e) {
+      const err = e as AxiosError
+      if (err.response?.status === 409) {
+        setShareErrorMessage('すでに共有されています')
+      } else if (err.response?.status === 400) {
+        setShareErrorMessage('ユーザーが見つかりません')
+      } else {
+        setShareErrorMessage('エラーが発生しました')
+      }
+    }
+  }, [shareUser, taskId, mutate])
 
   useEffect(() => {
     if (task) {
@@ -110,9 +147,33 @@ const TaskDetail = () => {
         <FormLabel>完了</FormLabel>
         <Checkbox isChecked={form.done} onChange={handleFormDoneChange} />
       </FormControl>
-      <Button onClick={handleUpdateTask}>更新</Button>
+      <Button mb="4" onClick={handleUpdateTask}>
+        更新
+      </Button>
+      <Divider mx="1" />
+      <Heading size="sm">共有</Heading>
+      <AvatarGroup max={2} size="md">
+        {task.shareList
+          .filter((share) => share.id !== user?.id)
+          .map((share) => (
+            <Avatar key={share.id} name={share.name} />
+          ))}
+      </AvatarGroup>
+      <FormControl isInvalid={shareErrorMessage !== ''}>
+        <FormLabel>共有するユーザー名</FormLabel>
+        <Input
+          name="shareUserName"
+          onChange={handleShareUserChange}
+          placeholder="ユーザー名"
+          value={shareUser}
+        />
+        {shareErrorMessage !== '' && (
+          <FormErrorMessage>{shareErrorMessage}</FormErrorMessage>
+        )}
+      </FormControl>
+      <Button onClick={handleShare}>共有</Button>
     </PageContainer>
   )
 }
 
-export default TaskDetail
+export default TaskDetailPage

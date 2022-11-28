@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-sql-driver/mysql"
 	"github.com/toshi-pono/todoapp/server/handler/openapi"
 	"github.com/toshi-pono/todoapp/server/model"
 )
@@ -165,12 +166,16 @@ func (h *Handlers) ShareTask(c *gin.Context, taskId openapi.TaskId) {
 		return
 	}
 
+	var mysqlError *mysql.MySQLError
 	err := h.Repo.ShareTask(userId, taskId, args.Name)
 	if errors.Is(err, model.ErrNotOwned) {
 		c.Status(http.StatusForbidden)
 		return
 	} else if errors.Is(err, model.ErrUserNotFound) {
 		c.Status(http.StatusBadRequest)
+		return
+	} else if errors.As(err, &mysqlError) && mysqlError.Number == model.ErrDuplicateKey {
+		c.Status(http.StatusConflict)
 		return
 	} else if err != nil {
 		c.Status(http.StatusInternalServerError)
