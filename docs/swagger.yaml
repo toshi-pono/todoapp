@@ -351,6 +351,7 @@ components:
           description: 新しいパスワード
       required:
         - password
+        - newPassword
     CreateUserRequest:
       title: CreateUserRequest
       type: object

@@ -64,4 +64,50 @@ func (h *Handlers) GetMe(c *gin.Context) {
 
 // ログインユーザーを更新
 // (PATCH /users/me)
-func (h *Handlers) UpdateMe(c *gin.Context) {}
+func (h *Handlers) UpdateMe(c *gin.Context) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	updateUserArgs := openapi.UpdateUserRequest{}
+	if err := c.ShouldBindJSON(&updateUserArgs); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	err := h.Repo.UpdateUserName(userId, updateUserArgs.Name)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+// ログインユーザーのパスワードを更新
+// (PATCH /users/password)
+func (h *Handlers) UpdatePassword(c *gin.Context) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	updatePasswordArgs := openapi.UpdatePasswordRequest{}
+	if err := c.ShouldBindJSON(&updatePasswordArgs); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	ok, err := h.Repo.UpdateUserPassword(userId, util.HashPassword(updatePasswordArgs.Password), util.HashPassword(updatePasswordArgs.NewPassword))
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	if !ok {
+		c.Status(http.StatusForbidden)
+		return
+	}
+	c.Status(http.StatusOK)
+}

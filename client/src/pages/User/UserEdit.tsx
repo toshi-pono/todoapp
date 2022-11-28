@@ -10,6 +10,8 @@ import {
   Divider,
   Stack,
 } from '@chakra-ui/react'
+import { AxiosError } from 'axios'
+import { useSWRConfig } from 'swr'
 
 import { useAuth } from '/@/libs/auth'
 import api from '/@/libs/apis'
@@ -21,6 +23,8 @@ interface PasswordEditForm {
 
 const UserEdit = () => {
   const { user } = useAuth()
+  const { mutate } = useSWRConfig()
+
   const [passwordForm, setPasswordForm] = useState<PasswordEditForm>({
     password: '',
     newPassword: '',
@@ -51,18 +55,30 @@ const UserEdit = () => {
   const handleUpdateName = useCallback(async () => {
     const res = await api.users.updateMe({ name: nameForm })
     if (res.status === 200) {
+      mutate('/users/me')
       // TODO: alertをかっこよくする
       alert('ユーザー名を更新しました')
     }
-  }, [nameForm])
+  }, [nameForm, mutate])
 
   const handleUpdatePassword = useCallback(async () => {
-    const res = await api.users.updatePassword(passwordForm)
-    if (res.status === 200) {
-      // TODO: alertをかっこよくする
-      alert('パスワードを更新しました')
+    try {
+      const res = await api.users.updatePassword(passwordForm)
+      if (res.status === 200) {
+        mutate('/users/me')
+        // TODO: alertをかっこよくする
+        alert('パスワードを更新しました')
+      }
+    } catch (e) {
+      const error = e as AxiosError
+      if (error.response?.status === 403) {
+        // TODO: alertをかっこよくする
+        alert('パスワードが間違っています')
+      } else {
+        throw e
+      }
     }
-  }, [passwordForm])
+  }, [passwordForm, mutate])
 
   useEffect(() => {
     if (user !== undefined) {

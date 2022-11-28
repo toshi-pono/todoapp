@@ -10,6 +10,8 @@ type UsersRepository interface {
 	GetUserById(userId uuid.UUID) (*User, error)
 	GetUserByName(name string) (*User, error)
 	CreateUser(args CreateUserArgs) error
+	UpdateUserName(userId uuid.UUID, name string) error
+	UpdateUserPassword(userId uuid.UUID, password []byte, newPassword []byte) (bool, error)
 }
 
 type User struct {
@@ -52,4 +54,30 @@ func (repo *SqlxRepository) CreateUser(args CreateUserArgs) error {
 		return err
 	}
 	return nil
+}
+
+// UpdateUserName ユーザー名を更新する
+func (repo *SqlxRepository) UpdateUserName(userId uuid.UUID, name string) error {
+	_, err := repo.db.Exec("UPDATE users SET name = ? WHERE id = ?", name, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// UpdateUserPassword パスワードを更新する
+func (repo *SqlxRepository) UpdateUserPassword(userId uuid.UUID, password []byte, newPassword []byte) (bool, error) {
+	result, err := repo.db.Exec("UPDATE users SET password = ? WHERE id = ? AND password = ?", newPassword, userId, password)
+	if err != nil {
+		return false, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	if rowsAffected == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
