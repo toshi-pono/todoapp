@@ -11,6 +11,8 @@ type TasksRepository interface {
 	GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error)
 	SearchTasks(limit int, offset int, query SearchTaskArgs) ([]Task, error)
 	CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error)
+	UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error)
+	DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
 }
 
 type Task struct {
@@ -26,6 +28,12 @@ const task_columns = "id, title, description, is_done, created_at"
 type CreateTaskArgs struct {
 	Title       string
 	Description string
+}
+
+type UpdateTaskArgs struct {
+	Title       string
+	Description string
+	IsDone      bool
 }
 
 type SearchTaskArgs struct {
@@ -87,4 +95,63 @@ func (repo *SqlxRepository) CreateTask(userId uuid.UUID, args CreateTaskArgs) (*
 
 	tx.Commit()
 	return &task, nil
+}
+
+// UpdateTask タスクを更新する
+func (repo *SqlxRepository) UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error) {
+	tx := repo.db.MustBegin()
+
+	var ownerId uuid.UUID
+	err := tx.Get(&ownerId, "SELECT user_id FROM ownership WHERE task_id = ?", taskId)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if ownerId != userId {
+		tx.Rollback()
+		return nil, ErrNotOwned
+	}
+
+	_, err = tx.Exec("UPDATE tasks SET title = ?, description = ?, is_done = ? WHERE id = ?", args.Title, args.Description, args.IsDone, taskId)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	task := Task{
+		ID:          taskId,
+		Title:       args.Title,
+		Description: args.Description,
+		IsDone:      args.IsDone,
+	}
+	tx.Commit()
+	return &task, nil
+}
+
+// DeleteTask タスクを削除する
+func (repo *SqlxRepository) DeleteTask(userId uuid.UUID, taskId uuid.UUID) error {
+	tx := repo.db.MustBegin()
+
+	var ownerId uuid.UUID
+	err := tx.Get(&ownerId, "SELECT user_id FROM ownership WHERE task_id = ?", taskId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if ownerId != userId {
+		tx.Rollback()
+		return ErrNotOwned
+	}
+
+	_, err = tx.Exec("DELETE FROM tasks WHERE id = ?", taskId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("DELETE FROM ownership WHERE task_id = ?", taskId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }

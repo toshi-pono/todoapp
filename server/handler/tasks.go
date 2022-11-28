@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -41,7 +42,8 @@ func (h *Handlers) GetTasks(c *gin.Context, params openapi.GetTasksParams) {
 			c.Status(http.StatusInternalServerError)
 			return
 		}
-		c.JSON(http.StatusOK, tasks)
+
+		c.JSON(http.StatusOK, convertTaskList(tasks))
 	}
 }
 
@@ -68,12 +70,28 @@ func (h *Handlers) CreateTask(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusCreated, task)
+	c.JSON(http.StatusCreated, convertTask(*task))
 }
 
 // タスクを削除
 // (DELETE /tasks/{taskId})
-func (h *Handlers) DeleteTask(c *gin.Context, taskId openapi.TaskId) {}
+func (h *Handlers) DeleteTask(c *gin.Context, taskId openapi.TaskId) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	err := h.Repo.DeleteTask(userId, taskId)
+	if errors.Is(err, model.ErrNotOwned) {
+		c.Status(http.StatusForbidden)
+		return
+	} else if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
 
 // タスクを取得
 // (GET /tasks/{taskId})
@@ -81,4 +99,49 @@ func (h *Handlers) GetTask(c *gin.Context, taskId openapi.TaskId) {}
 
 // タスクを更新
 // (PATCH /tasks/{taskId})
-func (h *Handlers) UpdateTask(c *gin.Context, taskId openapi.TaskId) {}
+func (h *Handlers) UpdateTask(c *gin.Context, taskId openapi.TaskId) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	args := openapi.UpdateTaskRequest{}
+	if err := c.ShouldBindJSON(&args); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	task, err := h.Repo.UpdateTask(userId, taskId, model.UpdateTaskArgs{
+		Title:       args.Title,
+		Description: args.Description,
+		IsDone:      args.Done,
+	})
+	if errors.Is(err, model.ErrNotOwned) {
+		c.Status(http.StatusForbidden)
+		return
+	} else if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, convertTask(*task))
+}
+
+// model.Task -> openapi.Task
+func convertTask(task model.Task) openapi.Task {
+	return openapi.Task{
+		Id:          task.ID,
+		Title:       task.Title,
+		Description: task.Description,
+		Done:        task.IsDone,
+		CreatedAt:   task.CreatedAt,
+	}
+}
+
+func convertTaskList(tasks []model.Task) []openapi.Task {
+	response := make([]openapi.Task, len(tasks))
+	for i, task := range tasks {
+		response[i] = convertTask(task)
+	}
+	return response
+}
