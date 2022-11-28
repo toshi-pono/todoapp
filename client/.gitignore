@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 .eslintcache
-src/utils/apis/generated
+src/libs/apis/generated
