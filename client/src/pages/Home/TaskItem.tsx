@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-import { Flex, Checkbox, IconButton, Spacer } from '@chakra-ui/react'
+import { Flex, Checkbox, IconButton, Box } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 
 import { Task } from '/@/libs/apis'
@@ -29,11 +29,12 @@ const TaskItem = ({ task, toggleHandler, deleteHandler }: Props) => {
           onChange={handleToggle}
           size="lg"
         />
-        <Link to={`/tasks/${task.id}`}>
-          <div>{task.title}</div>
-          <div>{task.description}</div>
-        </Link>
-        <Spacer />
+        <Box w="100%">
+          <Link to={`/tasks/${task.id}`}>
+            <div>{task.title}</div>
+            <div>{task.description}</div>
+          </Link>
+        </Box>
         <IconButton
           aria-label="delete"
           icon={<DeleteIcon />}

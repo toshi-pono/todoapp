@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   FormControl,
@@ -10,6 +10,8 @@ import {
   Button,
   Flex,
   Spacer,
+  Breadcrumb,
+  BreadcrumbItem,
 } from '@chakra-ui/react'
 
 import PageContainer from '/@/components/layouts/PageContainer'
@@ -51,10 +53,18 @@ const TaskCreate = () => {
 
   return (
     <PageContainer>
-      <Heading>Create Task</Heading>
+      <Breadcrumb>
+        <BreadcrumbItem>
+          <Link to="/">TaskList</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem isCurrentPage>
+          <Link to="#">New</Link>
+        </BreadcrumbItem>
+      </Breadcrumb>
+      <Heading mb="4">Create Task</Heading>
       <Stack spacing={4}>
         <FormControl isRequired>
-          <FormLabel>Title</FormLabel>
+          <FormLabel>タイトル</FormLabel>
           <Input
             name="title"
             onChange={handleFormChange}
@@ -63,7 +73,7 @@ const TaskCreate = () => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel>Description</FormLabel>
+          <FormLabel>説明</FormLabel>
           <Input
             name="description"
             onChange={handleFormChange}

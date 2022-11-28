@@ -6,7 +6,7 @@ import { Avatar, Flex, Spacer, Box, Heading } from '@chakra-ui/react'
 import { useAuth } from '/@/libs/auth'
 
 const Header = styled.header`
-  background-color: #ddd;
+  background-color: #319795;
 `
 
 const PageHeader = () => {
