@@ -163,6 +163,28 @@ paths:
         required: true
       tags:
         - users
+  /users/password:
+    patch:
+      summary: パスワードを更新
+      description: パスワードを更新します
+      security:
+        - cookieAuth: []
+      responses:
+        200:
+          description: OK
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+      operationId: updatePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordRequest'
+        required: true
+      tags:
+        - users
   /users:
     post:
       summary: ユーザーを作成
@@ -317,6 +339,18 @@ components:
           description: ユーザー名
       required:
         - name
+    UpdatePasswordRequest:
+      title: UpdatePasswordRequest
+      type: object
+      properties:
+        password:
+          type: string
+          description: パスワード
+        newPassword:
+          type: string
+          description: 新しいパスワード
+      required:
+        - password
     CreateUserRequest:
       title: CreateUserRequest
       type: object

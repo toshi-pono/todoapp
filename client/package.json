@@ -14,7 +14,7 @@
     "fix": "run-s fix:eslint fix:prettier",
     "fix:eslint": "npm run lint:eslint -- --fix",
     "fix:prettier": "npm run lint:prettier -- --write",
-    "gen-api": "openapi-generator-cli generate -g typescript-axios -i ../docs/swagger.yaml -o ./src/utils/apis/generated/",
+    "gen-api": "openapi-generator-cli generate -g typescript-axios -i ../docs/swagger.yaml -o ./src/libs/apis/generated/",
     "postinstall": "npm run gen-api"
   },
   "dependencies": {
