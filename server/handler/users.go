@@ -78,7 +78,11 @@ func (h *Handlers) UpdateMe(c *gin.Context) {
 	}
 
 	err := h.Repo.UpdateUserName(userId, updateUserArgs.Name)
-	if err != nil {
+	var mysqlError *mysql.MySQLError
+	if errors.As(err, &mysqlError) && mysqlError.Number == model.ErrDuplicateKey {
+		c.Status(http.StatusConflict)
+		return
+	} else if err != nil {
 		log.Println(err)
 		c.Status(http.StatusInternalServerError)
 		return
