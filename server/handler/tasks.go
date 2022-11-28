@@ -141,6 +141,33 @@ func (h *Handlers) UpdateTask(c *gin.Context, taskId openapi.TaskId) {
 	c.JSON(http.StatusOK, convertTask(*task))
 }
 
+func (h *Handlers) ShareTask(c *gin.Context, taskId openapi.TaskId) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	args := openapi.ShareTaskRequest{}
+	if err := c.ShouldBindJSON(&args); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	err := h.Repo.ShareTask(userId, taskId, args.Name)
+	if errors.Is(err, model.ErrNotOwned) {
+		c.Status(http.StatusForbidden)
+		return
+	} else if errors.Is(err, model.ErrUserNotFound) {
+		c.Status(http.StatusBadRequest)
+		return
+	} else if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 // model.Task -> openapi.Task
 func convertTask(task model.Task) openapi.Task {
 	return openapi.Task{

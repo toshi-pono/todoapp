@@ -1,6 +1,8 @@
 package model
 
 import (
+	"database/sql"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,6 +15,7 @@ type TasksRepository interface {
 	CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error)
 	UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error)
 	DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
+	ShareTask(userId uuid.UUID, taskId uuid.UUID, shareUserName string) error
 }
 
 type Task struct {
@@ -187,6 +190,43 @@ func (repo *SqlxRepository) DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
 			tx.Rollback()
 			return err
 		}
+	}
+
+	tx.Commit()
+	return nil
+}
+
+func (repo *SqlxRepository) ShareTask(userId uuid.UUID, taskId uuid.UUID, shareUserName string) error {
+	tx := repo.db.MustBegin()
+
+	// check ownership
+	var own_counter int
+	err := tx.Get(&own_counter, "SELECT COUNT(*) FROM ownership WHERE task_id = ? AND user_id = ?", taskId, userId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if own_counter == 0 {
+		tx.Rollback()
+		return ErrNotOwned
+	}
+
+	// check user
+	var user User
+	err = tx.Get(&user, "SELECT * FROM users WHERE name = ?", shareUserName)
+	if err == sql.ErrNoRows {
+		tx.Rollback()
+		return ErrUserNotFound
+	} else if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO ownership (user_id, task_id) VALUES (?, ?)", user.Id, taskId)
+	if err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return err
 	}
 
 	tx.Commit()

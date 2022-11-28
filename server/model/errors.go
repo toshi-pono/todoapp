@@ -7,5 +7,6 @@ const (
 )
 
 var (
-	ErrNotOwned = errors.New("permission denied")
+	ErrNotOwned     = errors.New("permission denied")
+	ErrUserNotFound = errors.New("user not found")
 )
