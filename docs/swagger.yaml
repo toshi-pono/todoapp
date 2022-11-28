@@ -422,7 +422,7 @@ components:
       description: 完了フラグ
       required: false
       schema:
-        type: boolean
+        type: string
 tags:
   - name: tasks
     description: タスク

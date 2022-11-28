@@ -38,7 +38,7 @@ type UpdateTaskArgs struct {
 
 type SearchTaskArgs struct {
 	Title *string
-	Done  *bool
+	Done  *string
 }
 
 // GetTask Idからタスクを取得する
@@ -81,7 +81,11 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 	// 完了状態の処理
 	if searchQuery.Done != nil {
 		query += ` AND is_done = ?`
-		done = *searchQuery.Done
+		if (*searchQuery.Done) == "yes" {
+			done = true
+		} else {
+			done = false
+		}
 	} else {
 		query += ` AND ?`
 		done = true

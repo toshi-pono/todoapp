@@ -1,4 +1,4 @@
-import { Fragment, useCallback } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 
 import { Divider, Stack } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
@@ -6,24 +6,47 @@ import useSWR from 'swr'
 
 import api, { Task } from '/@/libs/apis'
 
+import SearchForm, { SearchArgs } from './SearchForm'
 import TaskItem from './TaskItem'
 
 interface TaskArgs {
   limit?: number
   offset?: number
   keyword?: string
-  done?: boolean
+  done?: string
 }
 
 const TaskList = () => {
+  const [taskArgs, setTaskArgs] = useState<TaskArgs>({
+    limit: 10,
+    offset: 0,
+  })
+
   const tasksFetcher = (request: { url: string; args: TaskArgs }) => {
     return api.tasks
-      .getTasks(request.args.limit, request.args.offset, request.args.keyword)
+      .getTasks(
+        request.args.limit,
+        request.args.offset,
+        request.args.keyword,
+        request.args.done
+      )
       .then((res) => res.data)
   }
   const { data: tasks, mutate } = useSWR<Task[], AxiosError>(
-    { url: '/tasks', args: { limit: 10, offset: 0, keyword: undefined } },
+    { url: '/tasks', args: taskArgs },
     tasksFetcher
+  )
+
+  const handleSearchChange = useCallback(
+    (args: SearchArgs) => {
+      setTaskArgs((prev) => ({
+        ...prev,
+        keyword: args.keyword,
+        done: args.done,
+      }))
+      mutate()
+    },
+    [mutate]
   )
 
   const handleDeleteTask = useCallback(
@@ -61,6 +84,7 @@ const TaskList = () => {
 
   return (
     <Stack spacing={4}>
+      <SearchForm onChange={handleSearchChange} />
       <Divider />
       {tasks.map((task) => (
         <Fragment key={task.id}>
