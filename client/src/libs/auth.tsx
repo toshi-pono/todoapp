@@ -22,14 +22,11 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    const res = await api.auth.logout()
-    if (res.status === 204) {
-      mutate()
-    }
+    await api.auth.logout()
+    mutate(undefined)
   }
 
-  const isLogout =
-    (user === undefined && error?.response?.status === 401) ?? false
+  const isLogout = user === undefined && error?.response?.status === 401
 
   return {
     user,

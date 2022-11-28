@@ -5,6 +5,7 @@ import Home from '/@/pages/Home'
 import Login from '/@/pages/Login'
 import Task from '/@/pages/Task'
 import TaskCreate from '/@/pages/TaskCreate'
+import User from '/@/pages/User'
 
 const AppRoutes = () => {
   return (
@@ -19,6 +20,8 @@ const AppRoutes = () => {
         element={<RouteAuthGuard component={<TaskCreate />} />}
         path="/task/create"
       />
+      <Route element={<RouteAuthGuard component={<User />} />} path="/mypage" />
+      <Route element={<RouteAuthGuard component={<Home />} />} path="*" />
     </Routes>
   )
 }

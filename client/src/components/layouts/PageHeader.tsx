@@ -1,17 +1,30 @@
-import styled from '@emotion/styled'
+import { Link } from 'react-router-dom'
 
-const Header = styled.header`
-  background-color: #333;
-  color: #fff;
-  width: 100%;
-  height: 50px;
-`
+import { Avatar, Flex, Spacer, Box, Heading } from '@chakra-ui/react'
+
+import { useAuth } from '/@/libs/auth'
 
 const PageHeader = () => {
+  const { user, isLogout } = useAuth()
   return (
-    <Header>
-      <h1>Task Tracker</h1>
-    </Header>
+    <header>
+      <Flex alignItems="center" backgroundColor="#ccc" gap="2" p="2">
+        <Box p="2">
+          <Link to="/">
+            <Heading size="md">Task Tracker</Heading>
+          </Link>
+        </Box>
+
+        {user && !isLogout && (
+          <>
+            <Spacer />
+            <Link to="/mypage">
+              <Avatar name={user.name} size="md" />
+            </Link>
+          </>
+        )}
+      </Flex>
+    </header>
   )
 }
 
