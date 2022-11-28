@@ -1,6 +1,7 @@
 import React from 'react'
-import { useAuth } from '/@/libs/auth'
 import { Navigate } from 'react-router-dom'
+
+import { useAuth } from '/@/libs/auth'
 
 interface Props {
   component: React.ReactNode

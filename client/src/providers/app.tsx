@@ -1,6 +1,6 @@
 import React from 'react'
-
 import { BrowserRouter } from 'react-router-dom'
+
 import { ChakraProvider } from '@chakra-ui/react'
 
 type AppProviderProps = {

@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios'
 import useSWR from 'swr'
+
 import api, { User } from '/@/libs/apis'
 
 export const useAuth = () => {
