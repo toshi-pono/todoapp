@@ -41,21 +41,21 @@ const Login = () => {
       <Stack spacing={4}>
         <InputGroup>
           <Input
+            name="username"
+            onChange={handleFormChange}
             placeholder="Username"
             value={user.username}
-            onChange={handleFormChange}
-            name="username"
           />
         </InputGroup>
         <InputGroup>
           <Input
+            name="password"
+            onChange={handleFormChange}
             placeholder="Password"
             value={user.password}
-            onChange={handleFormChange}
-            name="password"
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handlePasswordShow}>
+            <Button h="1.75rem" onClick={handlePasswordShow} size="sm">
               {show ? 'Hide' : 'Show'}
             </Button>
           </InputRightElement>

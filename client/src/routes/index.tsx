@@ -9,15 +9,15 @@ import TaskCreate from '/@/pages/TaskCreate'
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<RouteAuthGuard component={<Home />} />} />
-      <Route path="/login" element={<Login />} />
+      <Route element={<RouteAuthGuard component={<Home />} />} path="/" />
+      <Route element={<Login />} path="/login" />
       <Route
-        path="/task/:taskId"
         element={<RouteAuthGuard component={<Task />} />}
+        path="/task/:taskId"
       />
       <Route
-        path="/task/create"
         element={<RouteAuthGuard component={<TaskCreate />} />}
+        path="/task/create"
       />
     </Routes>
   )

@@ -25,6 +25,7 @@
     "linebreak-style": ["error", "unix"],
     "react/react-in-jsx-scope": "off",
     "import/no-unresolved": "off",
+    "react/jsx-sort-props": ["error"],
     "import/order": [
       "error",
       {

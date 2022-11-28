@@ -11,7 +11,7 @@ const RouteAuthGuard = (props: Props) => {
   const { isLogout } = useAuth()
 
   if (isLogout) {
-    return <Navigate to="/login" replace={false} />
+    return <Navigate replace={false} to="/login" />
   }
 
   return <>{props.component}</>
