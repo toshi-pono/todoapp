@@ -129,13 +129,13 @@ func (repo *SqlxRepository) CreateTask(userId uuid.UUID, args CreateTaskArgs) (*
 func (repo *SqlxRepository) UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error) {
 	tx := repo.db.MustBegin()
 
-	var ownerId uuid.UUID
-	err := tx.Get(&ownerId, "SELECT user_id FROM ownership WHERE task_id = ?", taskId)
+	var count int
+	err := tx.Get(&count, "SELECT COUNT(*) FROM ownership WHERE task_id = ? AND user_id = ?", taskId, userId)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	if ownerId != userId {
+	if count == 0 {
 		tx.Rollback()
 		return nil, ErrNotOwned
 	}
@@ -159,27 +159,36 @@ func (repo *SqlxRepository) UpdateTask(userId uuid.UUID, taskId uuid.UUID, args 
 func (repo *SqlxRepository) DeleteTask(userId uuid.UUID, taskId uuid.UUID) error {
 	tx := repo.db.MustBegin()
 
-	var ownerId uuid.UUID
-	err := tx.Get(&ownerId, "SELECT user_id FROM ownership WHERE task_id = ?", taskId)
+	var own_counter int
+	err := tx.Get(&own_counter, "SELECT COUNT(*) FROM ownership WHERE task_id = ? AND user_id = ?", taskId, userId)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	if ownerId != userId {
+	if own_counter == 0 {
 		tx.Rollback()
 		return ErrNotOwned
 	}
 
-	_, err = tx.Exec("DELETE FROM tasks WHERE id = ?", taskId)
+	_, err = tx.Exec("DELETE FROM ownership WHERE task_id = ? AND user_id = ?", taskId, userId)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	_, err = tx.Exec("DELETE FROM ownership WHERE task_id = ?", taskId)
+	var count int
+	err = tx.Get(&count, "SELECT COUNT(*) FROM ownership WHERE task_id = ?", taskId)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
+	if count == 0 {
+		_, err = tx.Exec("DELETE FROM tasks WHERE id = ?", taskId)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
 	tx.Commit()
 	return nil
 }
