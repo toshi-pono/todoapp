@@ -31,6 +31,7 @@ paths:
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
         - $ref: '#/components/parameters/keyword'
+        - $ref: '#/components/parameters/done'
       tags:
         - tasks
     post:
@@ -76,7 +77,7 @@ paths:
         - $ref: '#/components/parameters/taskId'
       tags:
         - tasks
-    patch:
+    put:
       summary: タスクを更新
       description: タスクを更新します
       security:
@@ -138,7 +139,7 @@ paths:
       operationId: getMe
       tags:
         - users
-    patch:
+    put:
       summary: ログインユーザーを更新
       description: ログインユーザーを更新します
       security:
@@ -164,7 +165,7 @@ paths:
       tags:
         - users
   /users/password:
-    patch:
+    put:
       summary: パスワードを更新
       description: パスワードを更新します
       security:
@@ -415,7 +416,13 @@ components:
       required: false
       schema:
         type: string
-
+    done:
+      name: done
+      in: query
+      description: 完了フラグ
+      required: false
+      schema:
+        type: boolean
 tags:
   - name: tasks
     description: タスク
