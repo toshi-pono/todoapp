@@ -1,6 +1,8 @@
 package model
 
 import (
+	"bytes"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,6 +14,7 @@ type UsersRepository interface {
 	CreateUser(args CreateUserArgs) error
 	UpdateUserName(userId uuid.UUID, name string) error
 	UpdateUserPassword(userId uuid.UUID, password []byte, newPassword []byte) (bool, error)
+	DeleteUser(userId uuid.UUID, password []byte) error
 }
 
 type User struct {
@@ -80,4 +83,45 @@ func (repo *SqlxRepository) UpdateUserPassword(userId uuid.UUID, password []byte
 	}
 
 	return true, nil
+}
+
+// DeleteUser ユーザーを削除する
+func (repo *SqlxRepository) DeleteUser(userId uuid.UUID, password []byte) error {
+	tx := repo.db.MustBegin()
+	var user User
+	err := tx.Get(&user, "SELECT * FROM users WHERE id = ?", userId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	if !bytes.Equal(user.Password, password) {
+		tx.Rollback()
+		return ErrNotOwned
+	}
+
+	_, err = tx.Exec("DELETE FROM ownership WHERE user_id = ?", userId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	result, err := tx.Exec("DELETE FROM tasks WHERE id NOT IN (SELECT task_id FROM ownership)")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	log.Println("Deleted tasks:", rowsAffected)
+
+	_, err = tx.Exec("DELETE FROM users WHERE id = ?", userId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }

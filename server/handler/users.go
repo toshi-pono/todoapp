@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
@@ -110,4 +111,35 @@ func (h *Handlers) UpdatePassword(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusOK)
+}
+
+// ログインユーザーを削除
+// (DELETE /users/me)
+func (h *Handlers) DeleteUser(c *gin.Context) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	deleteUserRequest := openapi.DeleteUserRequest{}
+	if err := c.ShouldBindJSON(&deleteUserRequest); err != nil {
+		c.Status(http.StatusBadRequest)
+		return
+	}
+
+	err := h.Repo.DeleteUser(userId, util.HashPassword(deleteUserRequest.Password))
+	if errors.Is(err, model.ErrNotOwned) {
+		c.Status(http.StatusForbidden)
+		return
+	} else if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	session := sessions.Default(c)
+	session.Clear()
+	session.Options(sessions.Options{MaxAge: -1, Path: "/"})
+	session.Save()
+	c.Status(http.StatusNoContent)
 }

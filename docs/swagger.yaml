@@ -208,6 +208,27 @@ paths:
         required: true
       tags:
         - users
+    delete:
+      summary: ユーザーを削除
+      description: ユーザーを削除します
+      security:
+        - cookieAuth: []
+      responses:
+        204:
+          description: No Content
+        400:
+          description: Bad Request
+        401:
+          description: Unauthorized
+      operationId: deleteUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteUserRequest'
+        required: true
+      tags:
+        - users
   /login:
     post:
       summary: ログイン
@@ -340,6 +361,15 @@ components:
           description: ユーザー名
       required:
         - name
+    DeleteUserRequest:
+      title: DeleteUserRequest
+      type: object
+      properties:
+        password:
+          type: string
+          description: パスワード
+      required:
+        - password
     UpdatePasswordRequest:
       title: UpdatePasswordRequest
       type: object
