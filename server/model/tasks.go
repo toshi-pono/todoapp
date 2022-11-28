@@ -9,7 +9,7 @@ import (
 type TasksRepository interface {
 	GetTask(userId uuid.UUID, taskId uuid.UUID) (*Task, error)
 	GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error)
-	SearchTasks(limit int, offset int, query SearchTaskArgs) ([]Task, error)
+	SearchTasks(userId uuid.UUID, limit int, offset int, searchQuery SearchTaskArgs) ([]Task, error)
 	CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error)
 	UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error)
 	DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
@@ -37,13 +37,15 @@ type UpdateTaskArgs struct {
 }
 
 type SearchTaskArgs struct {
-	Title string
+	Title *string
+	Done  *bool
 }
 
 // GetTask Idからタスクを取得する
 func (repo *SqlxRepository) GetTask(userId uuid.UUID, taskId uuid.UUID) (*Task, error) {
 	var task Task
-	err := repo.db.Get(&task, "SELECT * FROM tasks JOIN ownership ON task_id = id WHERE user_id = ? AND id = ?", userId, taskId)
+	query := `SELECT ` + task_columns + ` FROM tasks JOIN ownership ON task_id = id WHERE user_id = ? AND id = ? LIMIT 1`
+	err := repo.db.Get(&task, query, userId, taskId)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +64,31 @@ func (repo *SqlxRepository) GetTasks(userId uuid.UUID, limit int, offset int) ([
 }
 
 // SearchTasks タスクを検索する
-func (repo *SqlxRepository) SearchTasks(limit int, offset int, query SearchTaskArgs) ([]Task, error) {
+func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int, searchQuery SearchTaskArgs) ([]Task, error) {
 	var tasks []Task
-	err := repo.db.Select(&tasks, "SELECT * FROM tasks WHERE title LIKE ? LIMIT ? OFFSET ?", "%"+query.Title+"%", limit, offset)
+	var title string
+	var done bool
+	query := `SELECT ` + task_columns + ` FROM tasks JOIN ownership ON task_id = id WHERE user_id = ?`
+
+	// タイトル(keyword)の処理
+	query += ` AND title LIKE ?`
+	if searchQuery.Title != nil {
+		title = "%" + *searchQuery.Title + "%"
+	} else {
+		title = "%" + "%" // 全件取得
+	}
+
+	// 完了状態の処理
+	if searchQuery.Done != nil {
+		query += ` AND is_done = ?`
+		done = *searchQuery.Done
+	} else {
+		query += ` AND ?`
+		done = true
+	}
+
+	query += ` LIMIT ? OFFSET ?`
+	err := repo.db.Select(&tasks, query, userId, title, done, limit, offset)
 	if err != nil {
 		return nil, err
 	}

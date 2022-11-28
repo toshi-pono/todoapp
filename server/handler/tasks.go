@@ -32,20 +32,17 @@ func (h *Handlers) GetTasks(c *gin.Context, params openapi.GetTasksParams) {
 		offset = 0
 	}
 
-	if params.Keyword != nil {
-		// キーワード検索
-		// TODO:
-	} else {
-		// 一覧取得
-		tasks, err := h.Repo.GetTasks(userId, limit, offset)
-		if err != nil {
-			log.Println(err)
-			c.Status(http.StatusInternalServerError)
-			return
-		}
-
-		c.JSON(http.StatusOK, convertTaskList(tasks))
+	// キーワード検索 or 完了フラグ検索
+	tasks, err := h.Repo.SearchTasks(userId, limit, offset, model.SearchTaskArgs{
+		Title: params.Keyword,
+		Done:  params.Done,
+	})
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
 	}
+	c.JSON(http.StatusOK, convertTaskList(tasks))
 }
 
 // タスクを作成
