@@ -7,7 +7,7 @@ import (
 )
 
 type UsersRepository interface {
-	GetUser(userId uuid.UUID) (*User, error)
+	GetUserById(userId uuid.UUID) (*User, error)
 	GetUserByName(name string) (*User, error)
 	CreateUser(args CreateUserArgs) error
 }
@@ -27,7 +27,7 @@ type CreateUserArgs struct {
 }
 
 // GetUser Idからユーザーを取得する
-func (repo *SqlxRepository) GetUser(userId uuid.UUID) (*User, error) {
+func (repo *SqlxRepository) GetUserById(userId uuid.UUID) (*User, error) {
 	var user User
 	err := repo.db.Get(&user, "SELECT * FROM users WHERE id = ?", userId)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 
 	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
 	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -36,6 +37,13 @@ func NewGinServer(handlers *Handlers) *gin.Engine {
 
 	// Create a basic Gin router
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Access-Control-Allow-Credentials", "Access-Control-Allow-Headers", "Origin", "Content-Length", "Content-Type"},
+		AllowCredentials: true,
+	}))
+
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("session", store))
 

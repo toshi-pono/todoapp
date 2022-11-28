@@ -44,7 +44,23 @@ func (h *Handlers) CreateUser(c *gin.Context) {
 
 // ログインユーザーを取得
 // (GET /users/me)
-func (h *Handlers) GetMe(c *gin.Context) {}
+func (h *Handlers) GetMe(c *gin.Context) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	user, err := h.Repo.GetUserById(userId)
+	if err != nil {
+		log.Println(err)
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, openapi.User{
+		Id:   user.Id,
+		Name: user.Name,
+	})
+}
 
 // ログインユーザーを更新
 // (PATCH /users/me)
