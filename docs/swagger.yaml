@@ -69,7 +69,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/TaskDetail'
         400:
           description: Bad Request
       operationId: getTask
@@ -328,6 +328,19 @@ components:
         - description
         - done
         - createdAt
+    TaskDetail:
+      title: TaskDetail
+      allOf:
+        - $ref: '#/components/schemas/Task'
+        - type: object
+          properties:
+            shareList:
+              type: array
+              description: 共有ユーザー
+              items:
+                $ref: '#/components/schemas/User'
+          required:
+            - shareList
     CreateTaskRequest:
       title: CreateTaskRequest
       type: object

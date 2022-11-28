@@ -108,7 +108,16 @@ func (h *Handlers) GetTask(c *gin.Context, taskId openapi.TaskId) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, convertTask(*task))
+
+	shareList, err := h.Repo.GetSharedUsers(userId, taskId)
+	if errors.Is(err, model.ErrNotOwned) {
+		c.Status(http.StatusForbidden)
+		return
+	} else if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, convertTaskDetail(*task, shareList))
 }
 
 // タスクを更新
@@ -141,6 +150,8 @@ func (h *Handlers) UpdateTask(c *gin.Context, taskId openapi.TaskId) {
 	c.JSON(http.StatusOK, convertTask(*task))
 }
 
+// タスクを共有する
+// (PUT /tasks/{taskId}/share)
 func (h *Handlers) ShareTask(c *gin.Context, taskId openapi.TaskId) {
 	userId, ok := getUserId(c)
 	if !ok {
@@ -185,4 +196,15 @@ func convertTaskList(tasks []model.Task) []openapi.Task {
 		response[i] = convertTask(task)
 	}
 	return response
+}
+
+func convertTaskDetail(task model.Task, sharedUsers []model.User) openapi.TaskDetail {
+	return openapi.TaskDetail{
+		CreatedAt:   task.CreatedAt,
+		Description: task.Description,
+		Done:        task.IsDone,
+		Id:          task.ID,
+		Title:       task.Title,
+		ShareList:   convertUserList(sharedUsers),
+	}
 }

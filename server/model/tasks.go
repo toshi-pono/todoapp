@@ -16,6 +16,7 @@ type TasksRepository interface {
 	UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error)
 	DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
 	ShareTask(userId uuid.UUID, taskId uuid.UUID, shareUserName string) error
+	GetSharedUsers(userId uuid.UUID, taskId uuid.UUID) ([]User, error)
 }
 
 type Task struct {
@@ -196,6 +197,7 @@ func (repo *SqlxRepository) DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
 	return nil
 }
 
+// ShareTask タスクを共有する
 func (repo *SqlxRepository) ShareTask(userId uuid.UUID, taskId uuid.UUID, shareUserName string) error {
 	tx := repo.db.MustBegin()
 
@@ -231,4 +233,23 @@ func (repo *SqlxRepository) ShareTask(userId uuid.UUID, taskId uuid.UUID, shareU
 
 	tx.Commit()
 	return nil
+}
+
+// GetSharedUsers タスクを共有しているユーザーを取得する
+func (repo *SqlxRepository) GetSharedUsers(userId uuid.UUID, taskId uuid.UUID) ([]User, error) {
+	var count int
+	err := repo.db.Get(&count, "SELECT COUNT(*) FROM ownership WHERE task_id = ? AND user_id = ?", taskId, userId)
+	if err != nil {
+		return nil, err
+	}
+	if count == 0 {
+		return nil, ErrNotOwned
+	}
+
+	var users []User
+	err = repo.db.Select(&users, "SELECT users.* FROM users INNER JOIN ownership ON users.id = ownership.user_id WHERE ownership.task_id = ?", taskId)
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }

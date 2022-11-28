@@ -57,10 +57,7 @@ func (h *Handlers) GetMe(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, openapi.User{
-		Id:   user.Id,
-		Name: user.Name,
-	})
+	c.JSON(http.StatusOK, convertUser(*user))
 }
 
 // ログインユーザーを更新
@@ -146,4 +143,19 @@ func (h *Handlers) DeleteUser(c *gin.Context) {
 	session.Options(sessions.Options{MaxAge: -1, Path: "/"})
 	session.Save()
 	c.Status(http.StatusNoContent)
+}
+
+func convertUser(user model.User) openapi.User {
+	return openapi.User{
+		Id:   user.Id,
+		Name: user.Name,
+	}
+}
+
+func convertUserList(users []model.User) []openapi.User {
+	var userList []openapi.User
+	for _, user := range users {
+		userList = append(userList, convertUser(user))
+	}
+	return userList
 }
