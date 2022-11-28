@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/toshi-pono/todoapp/server/handler/openapi"
 	"github.com/toshi-pono/todoapp/server/handler/util"
 )
@@ -51,7 +52,20 @@ func (h *Handlers) Login(c *gin.Context) {
 func (h *Handlers) Logout(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
-	session.Options(sessions.Options{MaxAge: -1})
+	session.Options(sessions.Options{MaxAge: -1, Path: "/"})
 	session.Save()
 	c.Status(http.StatusNoContent)
+}
+
+func getUserId(c *gin.Context) (uuid.UUID, bool) {
+	session := sessions.Default(c)
+	userId, ok := session.Get(userKey).(string)
+	if !ok {
+		return uuid.UUID{}, false
+	}
+	id, err := uuid.Parse(userId)
+	if err != nil {
+		return uuid.UUID{}, false
+	}
+	return id, true
 }

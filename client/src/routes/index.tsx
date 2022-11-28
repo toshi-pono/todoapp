@@ -1,19 +1,31 @@
-import { Title } from 'solid-start'
-import Counter from '~/components/Counter'
+import { Routes, Route } from 'react-router-dom'
 
-export default function Home() {
+import RouteAuthGuard from '/@/components/RouteAuthGuard'
+import Home from '/@/pages/Home'
+import Login from '/@/pages/Login'
+import TaskDetailPage from '/@/pages/TaskDetailPage'
+import TaskCreate from '/@/pages/TaskCreate'
+import User from '/@/pages/User'
+import Register from '/@/pages/Register'
+
+const AppRoutes = () => {
   return (
-    <main>
-      <Title>Hello World</Title>
-      <h1>Hello world!</h1>
-      <Counter />
-      <p>
-        Visit{' '}
-        <a href="https://start.solidjs.com" target="_blank">
-          start.solidjs.com
-        </a>{' '}
-        to learn how to build SolidStart apps.
-      </p>
-    </main>
+    <Routes>
+      <Route element={<RouteAuthGuard component={<Home />} />} path="/" />
+      <Route element={<Login />} path="/login" />
+      <Route
+        element={<RouteAuthGuard component={<TaskDetailPage />} />}
+        path="/tasks/:taskId"
+      />
+      <Route
+        element={<RouteAuthGuard component={<TaskCreate />} />}
+        path="/tasks/new"
+      />
+      <Route element={<RouteAuthGuard component={<User />} />} path="/mypage" />
+      <Route element={<Register />} path="/register" />
+      <Route element={<RouteAuthGuard component={<Home />} />} path="*" />
+    </Routes>
   )
 }
+
+export default AppRoutes

@@ -1,12 +1,15 @@
 {
   "env": {
     "browser": true,
-    "es2022": true
+    "node": true,
+    "es2021": true
   },
   "extends": [
     "eslint:recommended",
+    "plugin:import/errors",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:solid/typescript",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -14,11 +17,45 @@
     "ecmaFeatures": {
       "jsx": true
     },
-    "ecmaVersion": 2022,
+    "ecmaVersion": 2021,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["import", "react", "@typescript-eslint"],
   "rules": {
-    "linebreak-style": ["error", "unix"]
+    "linebreak-style": ["error", "unix"],
+    "react/react-in-jsx-scope": "off",
+    "import/no-unresolved": "off",
+    "react/jsx-sort-props": ["error"],
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "type"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "{react,react-dom/**,react-router-dom}",
+            "group": "builtin",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "alphabetize": {
+          "order": "asc"
+        },
+        "newlines-between": "always"
+      }
+    ]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
