@@ -8,9 +8,9 @@ import (
 
 type TasksRepository interface {
 	GetTask(taskId uuid.UUID) (*Task, error)
-	GetTasks(limit int, offset int) ([]Task, error)
+	GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error)
 	SearchTasks(limit int, offset int, query SearchTaskArgs) ([]Task, error)
-	CreateTask(args CreateTaskArgs) error
+	CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error)
 }
 
 type Task struct {
@@ -20,6 +20,8 @@ type Task struct {
 	IsDone      bool      `db:"is_done"`
 	CreatedAt   time.Time `db:"created_at"`
 }
+
+const task_columns = "id, title, description, is_done, created_at"
 
 type CreateTaskArgs struct {
 	Title       string
@@ -41,9 +43,10 @@ func (repo *SqlxRepository) GetTask(taskId uuid.UUID) (*Task, error) {
 }
 
 // GetTasks タスクを取得する
-func (repo *SqlxRepository) GetTasks(limit int, offset int) ([]Task, error) {
+func (repo *SqlxRepository) GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error) {
 	var tasks []Task
-	err := repo.db.Select(&tasks, "SELECT * FROM tasks LIMIT ? OFFSET ?", limit, offset)
+	query := `SELECT ` + task_columns + ` FROM tasks JOIN ownership ON task_id = id WHERE user_id = ? LIMIT ? OFFSET ?`
+	err := repo.db.Select(&tasks, query, userId, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +64,27 @@ func (repo *SqlxRepository) SearchTasks(limit int, offset int, query SearchTaskA
 }
 
 // CreateTask タスクを作成する
-func (repo *SqlxRepository) CreateTask(args CreateTaskArgs) error {
-	id := uuid.New()
-	_, err := repo.db.Exec("INSERT INTO tasks (id, title, description) VALUES (?, ?, ?)", id, args.Title, args.Description)
+func (repo *SqlxRepository) CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error) {
+	var task Task
+	taskId := uuid.New()
+	tx := repo.db.MustBegin()
+	_, err := tx.Exec("INSERT INTO tasks (id, title, description) VALUES (?, ?, ?)", taskId, args.Title, args.Description)
 	if err != nil {
-		return err
+		tx.Rollback()
+		return nil, err
 	}
-	return nil
+	_, err = tx.Exec("INSERT INTO ownership (user_id, task_id) VALUES (?, ?)", userId, taskId)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Get(&task, "SELECT * FROM tasks WHERE id = ?", taskId)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	tx.Commit()
+	return &task, nil
 }

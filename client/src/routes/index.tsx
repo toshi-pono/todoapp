@@ -14,11 +14,11 @@ const AppRoutes = () => {
       <Route element={<Login />} path="/login" />
       <Route
         element={<RouteAuthGuard component={<Task />} />}
-        path="/task/:taskId"
+        path="/tasks/:taskId"
       />
       <Route
         element={<RouteAuthGuard component={<TaskCreate />} />}
-        path="/task/create"
+        path="/tasks/new"
       />
       <Route element={<RouteAuthGuard component={<User />} />} path="/mypage" />
       <Route element={<RouteAuthGuard component={<Home />} />} path="*" />
