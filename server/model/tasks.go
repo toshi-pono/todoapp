@@ -7,7 +7,7 @@ import (
 )
 
 type TasksRepository interface {
-	GetTask(taskId uuid.UUID) (*Task, error)
+	GetTask(userId uuid.UUID, taskId uuid.UUID) (*Task, error)
 	GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error)
 	SearchTasks(limit int, offset int, query SearchTaskArgs) ([]Task, error)
 	CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error)
@@ -41,9 +41,9 @@ type SearchTaskArgs struct {
 }
 
 // GetTask Idからタスクを取得する
-func (repo *SqlxRepository) GetTask(taskId uuid.UUID) (*Task, error) {
+func (repo *SqlxRepository) GetTask(userId uuid.UUID, taskId uuid.UUID) (*Task, error) {
 	var task Task
-	err := repo.db.Get(&task, "SELECT * FROM tasks WHERE id = ?", taskId)
+	err := repo.db.Get(&task, "SELECT * FROM tasks JOIN ownership ON task_id = id WHERE user_id = ? AND id = ?", userId, taskId)
 	if err != nil {
 		return nil, err
 	}

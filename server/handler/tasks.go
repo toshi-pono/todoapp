@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"errors"
 	"log"
 	"net/http"
@@ -95,7 +96,23 @@ func (h *Handlers) DeleteTask(c *gin.Context, taskId openapi.TaskId) {
 
 // タスクを取得
 // (GET /tasks/{taskId})
-func (h *Handlers) GetTask(c *gin.Context, taskId openapi.TaskId) {}
+func (h *Handlers) GetTask(c *gin.Context, taskId openapi.TaskId) {
+	userId, ok := getUserId(c)
+	if !ok {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	task, err := h.Repo.GetTask(userId, taskId)
+	if errors.Is(err, sql.ErrNoRows) {
+		c.Status(http.StatusNotFound)
+		return
+	} else if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, convertTask(*task))
+}
 
 // タスクを更新
 // (PATCH /tasks/{taskId})
