@@ -7,11 +7,9 @@ interface Props {
 }
 
 const RouteAuthGuard = (props: Props) => {
-  const { user, isLogout } = useAuth()
-  console.log(user)
-  console.log(isLogout)
+  const { isLogout } = useAuth()
 
-  if (user === null) {
+  if (isLogout) {
     return <Navigate to="/login" replace={false} />
   }
 
