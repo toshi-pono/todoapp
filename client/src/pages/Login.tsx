@@ -1,11 +1,14 @@
-import { ChangeEvent, useCallback, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useState } from 'react'
 
+import { useNavigate } from 'react-router'
 import {
   Heading,
   Input,
   Button,
   InputGroup,
   Stack,
+  FormControl,
+  FormLabel,
   InputRightElement,
 } from '@chakra-ui/react'
 
@@ -18,49 +21,68 @@ interface FormValues {
 }
 
 const Login = () => {
-  const { login } = useAuth()
+  const { login, isLogout, user } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (user && !isLogout) {
+      navigate('/')
+    }
+  }, [isLogout, navigate, user])
 
   const [show, setShow] = useState(false)
   const handlePasswordShow = useCallback(() => setShow(!show), [show])
 
-  const [user, setUser] = useState<FormValues>({ username: '', password: '' })
+  const [loginForm, setLoginForm] = useState<FormValues>({
+    username: '',
+    password: '',
+  })
   const handleFormChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target
-      setUser({ ...user, [name]: value })
+      setLoginForm({ ...loginForm, [name]: value })
     },
-    [user]
+    [loginForm]
   )
 
   const handleLogin = useCallback(async () => {
-    await login(user.username, user.password)
-  }, [login, user.password, user.username])
+    await login(loginForm.username, loginForm.password)
+  }, [login, loginForm.password, loginForm.username])
   return (
     <PageContainer>
       <Heading>Login</Heading>
       <Stack spacing={4}>
-        <InputGroup>
-          <Input
-            name="username"
-            onChange={handleFormChange}
-            placeholder="Username"
-            value={user.username}
-          />
-        </InputGroup>
-        <InputGroup>
-          <Input
-            name="password"
-            onChange={handleFormChange}
-            placeholder="Password"
-            value={user.password}
-          />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" onClick={handlePasswordShow} size="sm">
-              {show ? 'Hide' : 'Show'}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        <Button onClick={handleLogin}>Login</Button>
+        <FormControl isRequired>
+          <FormLabel>Name</FormLabel>
+          <InputGroup>
+            <Input
+              name="username"
+              onChange={handleFormChange}
+              placeholder="Username"
+              value={loginForm.username}
+            />
+          </InputGroup>
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>Password</FormLabel>
+          <InputGroup>
+            <Input
+              name="password"
+              onChange={handleFormChange}
+              placeholder="Password"
+              type={show ? 'text' : 'password'}
+              value={loginForm.password}
+            />
+            <InputRightElement width="4.5rem">
+              <Button h="1.75rem" onClick={handlePasswordShow} size="sm">
+                {show ? 'Hide' : 'Show'}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+        <FormControl>
+          <Button onClick={handleLogin}>Login</Button>
+        </FormControl>
       </Stack>
     </PageContainer>
   )

@@ -5,6 +5,7 @@ import styled from '@emotion/styled'
 const Container = styled.main`
   width: 100%;
   max-width: 1024px;
+  padding: 16px;
 `
 
 interface Props {
