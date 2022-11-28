@@ -25,7 +25,7 @@ interface FormValues {
 }
 
 const Register = () => {
-  const { login, isLogout, user } = useAuth()
+  const { isLogout, user } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
