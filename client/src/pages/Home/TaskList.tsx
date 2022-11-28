@@ -12,6 +12,7 @@ interface TaskArgs {
   limit?: number
   offset?: number
   keyword?: string
+  done?: boolean
 }
 
 const TaskList = () => {
