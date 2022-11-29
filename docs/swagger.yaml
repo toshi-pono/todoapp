@@ -19,9 +19,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Task'
+                $ref: '#/components/schemas/TaskList'
         400:
           description: Bad Request
         401:
@@ -341,6 +339,21 @@ components:
                 $ref: '#/components/schemas/User'
           required:
             - shareList
+    TaskList:
+      title: TaskList
+      type: object
+      properties:
+        tasks:
+          type: array
+          description: タスクリスト
+          items:
+            $ref: '#/components/schemas/Task'
+        total:
+          type: integer
+          description: タスク総数
+      required:
+        - tasks
+        - total
     CreateTaskRequest:
       title: CreateTaskRequest
       type: object
@@ -507,4 +520,3 @@ tags:
     description: ユーザー
   - name: auth
     description: 認証
-
