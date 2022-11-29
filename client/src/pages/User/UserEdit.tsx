@@ -10,6 +10,10 @@ import {
   Divider,
   Stack,
   useToast,
+  VStack,
+  StackDivider,
+  Heading,
+  Flex,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useSWRConfig } from 'swr'
@@ -111,7 +115,7 @@ const UserEdit = () => {
         throw e
       }
     }
-  }, [passwordForm, mutate])
+  }, [passwordForm, mutate, toast])
 
   useEffect(() => {
     if (user !== undefined) {
@@ -120,58 +124,65 @@ const UserEdit = () => {
   }, [user])
 
   return (
-    <Stack>
-      <FormControl isRequired>
-        <FormLabel>Name</FormLabel>
-        <InputGroup>
-          <Input
-            name="username"
-            onChange={handleNameChange}
-            placeholder="Username"
-            value={nameForm}
-          />
-        </InputGroup>
-        <Button mt="2" onClick={handleUpdateName}>
-          更新する
-        </Button>
-      </FormControl>
-      <Divider mx="10" />
-      <FormControl isRequired>
-        <FormLabel>Password</FormLabel>
-        <InputGroup>
-          <Input
-            name="password"
-            onChange={handlePasswordChange}
-            placeholder="Password"
-            type={show ? 'text' : 'password'}
-            value={passwordForm.password}
-          />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" onClick={handlePasswordShow} size="sm">
-              {show ? 'Hide' : 'Show'}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        <FormLabel>New Password</FormLabel>
-        <InputGroup>
-          <Input
-            name="newPassword"
-            onChange={handlePasswordChange}
-            placeholder="new Password"
-            type={showNew ? 'text' : 'password'}
-            value={passwordForm.newPassword}
-          />
-          <InputRightElement width="4.5rem">
-            <Button h="1.75rem" onClick={handleNewPasswordShow} size="sm">
-              {showNew ? 'Hide' : 'Show'}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-        <Button mt="2" onClick={handleUpdatePassword}>
-          更新する
-        </Button>
-      </FormControl>
-    </Stack>
+    <VStack align="stretch" divider={<StackDivider />}>
+      <Stack>
+        <FormControl isRequired>
+          <Heading size="md">ユーザー名</Heading>
+          <FormLabel>ユーザー名</FormLabel>
+          <InputGroup>
+            <Input
+              name="username"
+              onChange={handleNameChange}
+              placeholder="Username"
+              value={nameForm}
+            />
+          </InputGroup>
+        </FormControl>
+        <Flex justifyContent="right">
+          <Button onClick={handleUpdateName}>更新する</Button>
+        </Flex>
+      </Stack>
+      <Stack>
+        <Heading size="md">パスワード</Heading>
+        <FormControl isRequired>
+          <FormLabel>元のパスワード</FormLabel>
+          <InputGroup>
+            <Input
+              name="password"
+              onChange={handlePasswordChange}
+              placeholder="Password"
+              type={show ? 'text' : 'password'}
+              value={passwordForm.password}
+            />
+            <InputRightElement width="4.5rem">
+              <Button h="1.75rem" onClick={handlePasswordShow} size="sm">
+                {show ? 'Hide' : 'Show'}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+        <FormControl isRequired>
+          <FormLabel>新しいパスワード</FormLabel>
+          <InputGroup>
+            <Input
+              name="newPassword"
+              onChange={handlePasswordChange}
+              placeholder="new Password"
+              type={showNew ? 'text' : 'password'}
+              value={passwordForm.newPassword}
+            />
+            <InputRightElement width="4.5rem">
+              <Button h="1.75rem" onClick={handleNewPasswordShow} size="sm">
+                {showNew ? 'Hide' : 'Show'}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+        <Flex justifyContent="right">
+          <Button onClick={handleUpdatePassword}>更新する</Button>
+        </Flex>
+      </Stack>
+    </VStack>
   )
 }
 

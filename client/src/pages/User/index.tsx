@@ -11,8 +11,13 @@ import {
   useDisclosure,
   Button,
   Heading,
-  Divider,
   Input,
+  VStack,
+  Text,
+  Stack,
+  StackDivider,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react'
 
 import PageContainer from '/@/components/layouts/PageContainer'
@@ -72,16 +77,24 @@ const User = () => {
   return (
     <>
       <PageContainer>
-        <Heading>マイページ</Heading>
-        <UserEdit />
-        <Divider />
-        <Heading size="sm">ログアウト</Heading>
-        <Button onClick={logout}>Logout</Button>
-        <Divider />
-        <Heading size="sm">退会</Heading>
-        <Button colorScheme="red" onClick={handleButtonDelete}>
-          退会
-        </Button>
+        <Heading mb="8" size="2xl">
+          マイページ
+        </Heading>
+        <VStack align="stretch" divider={<StackDivider />} spacing={4}>
+          <UserEdit />
+          <Stack align="start">
+            <Heading size="md">ログアウト</Heading>
+            <Button onClick={logout} w="100px">
+              Logout
+            </Button>
+          </Stack>
+          <Stack align="start">
+            <Heading size="md">退会</Heading>
+            <Button colorScheme="red" onClick={handleButtonDelete} w="100px">
+              退会
+            </Button>
+          </Stack>
+        </VStack>
       </PageContainer>
       <AlertDialog
         isOpen={isOpen}
@@ -96,18 +109,28 @@ const User = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              本当にアカウントを削除しますか？
-              <Input
-                onChange={handlePasswordChange}
-                placeholder="パスワード"
-                value={password}
-              />
+              <Text>本当にアカウントを削除しますか？</Text>
+              <FormControl isRequired>
+                <FormLabel>パスワード</FormLabel>
+                <Input
+                  onChange={handlePasswordChange}
+                  placeholder="パスワード"
+                  value={password}
+                />
+              </FormControl>
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button onClick={handleDeleteCancel}>Cancel</Button>
-              <Button colorScheme="red" ml={3} onClick={handleDeleteFix}>
-                Delete
+              <Button onClick={handleDeleteCancel} w="110px">
+                キャンセル
+              </Button>
+              <Button
+                colorScheme="red"
+                ml={3}
+                onClick={handleDeleteFix}
+                w="100px"
+              >
+                削除
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

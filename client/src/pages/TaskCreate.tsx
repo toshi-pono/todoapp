@@ -90,10 +90,10 @@ const TaskCreate = () => {
           <Link to="#">New</Link>
         </BreadcrumbItem>
       </Breadcrumb>
-      <Heading mb="4">Create Task</Heading>
+      <Heading mb="8">Create Task</Heading>
       <Stack spacing={4}>
         <FormControl isRequired>
-          <FormLabel>タイトル</FormLabel>
+          <FormLabel mb="0">タイトル</FormLabel>
           <Input
             name="title"
             onChange={handleFormChange}
@@ -102,7 +102,7 @@ const TaskCreate = () => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel>説明</FormLabel>
+          <FormLabel mb="0">説明</FormLabel>
           <Input
             name="description"
             onChange={handleFormChange}
@@ -111,7 +111,7 @@ const TaskCreate = () => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel>期限</FormLabel>
+          <FormLabel mb="0">期限</FormLabel>
           <Input
             name="deadline"
             onChange={handleFormChange}
@@ -121,7 +121,7 @@ const TaskCreate = () => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel>優先度</FormLabel>
+          <FormLabel>優先度： {form.priority + 1}/5</FormLabel>
           <Slider
             defaultValue={2}
             max={4}
@@ -139,7 +139,9 @@ const TaskCreate = () => {
         </FormControl>
         <Flex>
           <Spacer />
-          <Button onClick={handleSubmit}>作成</Button>
+          <Button onClick={handleSubmit} w="100px">
+            作成
+          </Button>
         </Flex>
       </Stack>
     </PageContainer>

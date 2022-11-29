@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+import { AddIcon } from '@chakra-ui/icons'
 import {
   Stack,
   Heading,
@@ -8,6 +9,7 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   Button,
+  Text,
 } from '@chakra-ui/react'
 
 import TaskListComponent from './TaskList'
@@ -23,11 +25,13 @@ const Home = () => {
         </BreadcrumbItem>
       </Breadcrumb>
       <Stack spacing={4}>
-        <Heading>TaskList</Heading>
+        <Heading mb="0" size="2xl">
+          TaskList
+        </Heading>
         <Flex>
           <Spacer />
           <Button as={Link} colorScheme="teal" to="/tasks/new">
-            新規作成
+            <Text mr="1">新規作成</Text> <AddIcon />
           </Button>
         </Flex>
         <TaskListComponent />

@@ -154,7 +154,7 @@ const TaskDetailPage = () => {
           <Link to="#">TaskDetail</Link>
         </BreadcrumbItem>
       </Breadcrumb>
-      <Heading mb="4" size="2xl">
+      <Heading mb="8" size="2xl">
         Task Detail
       </Heading>
       <VStack align="stretch" divider={<StackDivider />} spacing="4">
@@ -212,7 +212,9 @@ const TaskDetailPage = () => {
             <Checkbox isChecked={form.done} onChange={handleFormDoneChange} />
           </FormControl>
           <Flex justifyContent="right">
-            <Button onClick={handleUpdateTask}>更新</Button>
+            <Button onClick={handleUpdateTask} w="100px">
+              更新
+            </Button>
           </Flex>
         </Stack>
         <Stack>
@@ -237,7 +239,9 @@ const TaskDetailPage = () => {
             )}
           </FormControl>
           <Flex justifyContent="right">
-            <Button onClick={handleShare}>共有</Button>
+            <Button onClick={handleShare} w="100px">
+              共有
+            </Button>
           </Flex>
         </Stack>
       </VStack>

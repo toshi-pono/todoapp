@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 
+import { SearchIcon } from '@chakra-ui/icons'
 import {
   FormControl,
   FormLabel,
@@ -8,6 +9,7 @@ import {
   Select,
   Button,
   Box,
+  Text,
 } from '@chakra-ui/react'
 
 export interface SearchArgs {
@@ -81,8 +83,8 @@ const SearchForm = ({ onChange }: Props) => {
         </FormControl>
       </Flex>
       <Flex justifyContent="right">
-        <Button mt="2" onClick={searchHandler}>
-          検索
+        <Button mt="2" onClick={searchHandler} w="100px">
+          <Text mr="1">検索</Text> <SearchIcon />
         </Button>
       </Flex>
     </Box>
