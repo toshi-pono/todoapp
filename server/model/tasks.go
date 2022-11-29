@@ -85,6 +85,7 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 
 	// タイトル(keyword)の処理
 	query += ` AND title LIKE ?`
+	countQuery += ` AND title LIKE ?`
 	if searchQuery.Title != nil {
 		title = "%" + *searchQuery.Title + "%"
 	} else {
@@ -115,6 +116,7 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 	var count int
 	err = repo.db.Get(&count, countQuery, userId, title, done)
 	if err != nil {
+		log.Println(countQuery)
 		return nil, 0, err
 	}
 
