@@ -11,8 +11,8 @@ import {
   FormLabel,
   InputRightElement,
   Link as ChakraLink,
-  useToast,
   Flex,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
@@ -30,7 +30,6 @@ interface FormValues {
 const Register = () => {
   const { isLogout, user } = useAuth()
   const navigate = useNavigate()
-  const toast = useToast()
 
   useEffect(() => {
     if (user && !isLogout) {
@@ -40,6 +39,7 @@ const Register = () => {
 
   const [show, setShow] = useState(false)
   const handlePasswordShow = useCallback(() => setShow(!show), [show])
+  const [errorMessage, setErrorMessage] = useState('')
 
   const [registerForm, setRegisterForm] = useState<FormValues>({
     username: '',
@@ -60,28 +60,17 @@ const Register = () => {
         password: registerForm.password,
       })
       if (res.status === 201) {
+        setErrorMessage('')
         navigate('/login')
       }
     } catch (e) {
       if ((e as AxiosError).response?.status === 409) {
-        toast({
-          title: 'アカウントを作成できませんでした',
-          description: 'ユーザー名が既に存在しています',
-          status: 'error',
-          duration: 6000,
-          isClosable: true,
-        })
+        setErrorMessage('ユーザー名が重複しています')
       } else {
-        toast({
-          title: 'アカウントを作成できませんでした',
-          description: 'エラーが発生しました',
-          status: 'error',
-          duration: 6000,
-          isClosable: true,
-        })
+        setErrorMessage('エラーが発生しました')
       }
     }
-  }, [navigate, registerForm.password, registerForm.username, toast])
+  }, [navigate, registerForm.password, registerForm.username])
 
   return (
     <PageContainer>
@@ -89,7 +78,7 @@ const Register = () => {
         Register
       </Heading>
       <Stack spacing={4}>
-        <FormControl isRequired>
+        <FormControl isInvalid={errorMessage !== ''} isRequired>
           <FormLabel mb="0">ユーザー名</FormLabel>
           <InputGroup>
             <Input
@@ -100,7 +89,7 @@ const Register = () => {
             />
           </InputGroup>
         </FormControl>
-        <FormControl isRequired>
+        <FormControl isInvalid={errorMessage !== ''} isRequired>
           <FormLabel mb="0">パスワード</FormLabel>
           <InputGroup>
             <Input
@@ -116,6 +105,9 @@ const Register = () => {
               </Button>
             </InputRightElement>
           </InputGroup>
+          <FormErrorMessage>
+            {errorMessage !== '' ? errorMessage : ''}
+          </FormErrorMessage>
         </FormControl>
         <Flex justifyContent="center">
           <Button onClick={handleRegister} w="300px">

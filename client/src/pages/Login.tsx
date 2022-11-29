@@ -13,6 +13,7 @@ import {
   InputRightElement,
   Link as ChakraLink,
   Flex,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 
 import PageContainer from '/@/components/layouts/PageContainer'
@@ -36,6 +37,8 @@ const Login = () => {
   const [show, setShow] = useState(false)
   const handlePasswordShow = useCallback(() => setShow(!show), [show])
 
+  const [errorMessage, setErrorMessage] = useState('')
+
   const [loginForm, setLoginForm] = useState<FormValues>({
     username: '',
     password: '',
@@ -49,7 +52,12 @@ const Login = () => {
   )
 
   const handleLogin = useCallback(async () => {
-    await login(loginForm.username, loginForm.password)
+    try {
+      await login(loginForm.username, loginForm.password)
+      setErrorMessage('')
+    } catch (error) {
+      setErrorMessage('ログインできませんでした')
+    }
   }, [login, loginForm.password, loginForm.username])
   return (
     <PageContainer>
@@ -57,7 +65,7 @@ const Login = () => {
         Login
       </Heading>
       <Stack spacing={4}>
-        <FormControl isRequired>
+        <FormControl isInvalid={errorMessage !== ''} isRequired>
           <FormLabel mb="0">ユーザー名</FormLabel>
           <InputGroup>
             <Input
@@ -68,7 +76,7 @@ const Login = () => {
             />
           </InputGroup>
         </FormControl>
-        <FormControl isRequired>
+        <FormControl isInvalid={errorMessage !== ''} isRequired>
           <FormLabel mb="0">パスワード</FormLabel>
           <InputGroup>
             <Input
@@ -84,6 +92,7 @@ const Login = () => {
               </Button>
             </InputRightElement>
           </InputGroup>
+          <FormErrorMessage>{errorMessage}</FormErrorMessage>
         </FormControl>
         <Flex justifyContent="center">
           <Button onClick={handleLogin} w="300px">
