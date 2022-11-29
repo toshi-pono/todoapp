@@ -24,20 +24,26 @@ type Task struct {
 	Title       string    `db:"title"`
 	Description string    `db:"description"`
 	IsDone      bool      `db:"is_done"`
+	Priority    int       `db:"priority"`
+	Deadline    time.Time `db:"deadline"`
 	CreatedAt   time.Time `db:"created_at"`
 }
 
-const task_columns = "id, title, description, is_done, created_at"
+const task_columns = "id, title, description, is_done, created_at, priority, deadline"
 
 type CreateTaskArgs struct {
 	Title       string
 	Description string
+	Priority    int
+	Deadline    time.Time
 }
 
 type UpdateTaskArgs struct {
 	Title       string
 	Description string
 	IsDone      bool
+	Priority    int
+	Deadline    time.Time
 }
 
 type SearchTaskArgs struct {
@@ -107,7 +113,7 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 		done = true
 	}
 
-	query += ` LIMIT ? OFFSET ?`
+	query += ` ORDER BY deadline ASC LIMIT ? OFFSET ?`
 	err := repo.db.Select(&tasks, query, userId, title, done, limit, offset)
 	if err != nil {
 		return nil, 0, err
@@ -128,7 +134,7 @@ func (repo *SqlxRepository) CreateTask(userId uuid.UUID, args CreateTaskArgs) (*
 	var task Task
 	taskId := uuid.New()
 	tx := repo.db.MustBegin()
-	_, err := tx.Exec("INSERT INTO tasks (id, title, description) VALUES (?, ?, ?)", taskId, args.Title, args.Description)
+	_, err := tx.Exec("INSERT INTO tasks (id, title, description, priority, deadline) VALUES (?, ?, ?, ?, ?)", taskId, args.Title, args.Description, args.Priority, args.Deadline)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -164,7 +170,7 @@ func (repo *SqlxRepository) UpdateTask(userId uuid.UUID, taskId uuid.UUID, args 
 		return nil, ErrNotOwned
 	}
 
-	_, err = tx.Exec("UPDATE tasks SET title = ?, description = ?, is_done = ? WHERE id = ?", args.Title, args.Description, args.IsDone, taskId)
+	_, err = tx.Exec("UPDATE tasks SET title = ?, description = ?, is_done = ?, priority = ?, deadline = ? WHERE id = ?", args.Title, args.Description, args.IsDone, args.Priority, args.Deadline, taskId)
 	if err != nil {
 		tx.Rollback()
 		return nil, err

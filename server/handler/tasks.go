@@ -67,8 +67,11 @@ func (h *Handlers) CreateTask(c *gin.Context) {
 	task, err := h.Repo.CreateTask(userId, model.CreateTaskArgs{
 		Title:       args.Title,
 		Description: args.Description,
+		Priority:    args.Priority,
+		Deadline:    args.Deadline,
 	})
 	if err != nil {
+		log.Println(err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
@@ -143,6 +146,8 @@ func (h *Handlers) UpdateTask(c *gin.Context, taskId openapi.TaskId) {
 		Title:       args.Title,
 		Description: args.Description,
 		IsDone:      args.Done,
+		Priority:    args.Priority,
+		Deadline:    args.Deadline,
 	})
 	if errors.Is(err, model.ErrNotOwned) {
 		c.Status(http.StatusForbidden)
@@ -195,6 +200,8 @@ func convertTask(task model.Task) openapi.Task {
 		Description: task.Description,
 		Done:        task.IsDone,
 		CreatedAt:   task.CreatedAt,
+		Priority:    task.Priority,
+		Deadline:    task.Deadline,
 	}
 }
 
@@ -213,6 +220,8 @@ func convertTaskDetail(task model.Task, sharedUsers []model.User) openapi.TaskDe
 		Done:        task.IsDone,
 		Id:          task.ID,
 		Title:       task.Title,
+		Priority:    task.Priority,
+		Deadline:    task.Deadline,
 		ShareList:   convertUserList(sharedUsers),
 	}
 }

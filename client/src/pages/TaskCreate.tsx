@@ -12,15 +12,29 @@ import {
   Spacer,
   Breadcrumb,
   BreadcrumbItem,
+  Box,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
 } from '@chakra-ui/react'
 
 import PageContainer from '/@/components/layouts/PageContainer'
 import api from '/@/libs/apis'
+import { toFormDate } from '/@/libs/date'
 
 interface TaskForm {
   title: string
   description: string
+  priority: number
+  deadline: string
 }
+
+const dDeadline = new Date()
+dDeadline.setDate(dDeadline.getDate() + 1)
+dDeadline.setHours(dDeadline.getHours() + 9)
+
+const dtString = toFormDate(dDeadline)
 
 const TaskCreate = () => {
   const navigate = useNavigate()
@@ -28,6 +42,8 @@ const TaskCreate = () => {
   const [form, setForm] = useState<TaskForm>({
     title: '',
     description: '',
+    priority: 2,
+    deadline: dtString,
   })
   const handleFormChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,13 +54,26 @@ const TaskCreate = () => {
     },
     []
   )
+  const handleFormPriorityChange = useCallback((val: number) => {
+    setForm((prev) => ({
+      ...prev,
+      priority: val,
+    }))
+  }, [])
 
   const handleSubmit = useCallback(async () => {
-    const res = await api.tasks.createTask(form)
+    const res = await api.tasks.createTask({
+      title: form.title,
+      description: form.description,
+      priority: form.priority,
+      deadline: new Date(form.deadline).toISOString(),
+    })
     if (res.status === 201) {
       setForm({
         title: '',
         description: '',
+        priority: 2,
+        deadline: dtString,
       })
       // TODO: / or /tasks どちらが良いか考える
       navigate('/')
@@ -80,6 +109,33 @@ const TaskCreate = () => {
             placeholder="Description"
             value={form.description}
           />
+        </FormControl>
+        <FormControl>
+          <FormLabel>期限</FormLabel>
+          <Input
+            name="deadline"
+            onChange={handleFormChange}
+            placeholder="締め切り"
+            type="datetime-local"
+            value={form.deadline}
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel>優先度</FormLabel>
+          <Slider
+            defaultValue={2}
+            max={4}
+            min={0}
+            onChange={handleFormPriorityChange}
+            step={1}
+            value={form.priority}
+          >
+            <SliderTrack bg="teal.100">
+              <Box position="relative" right={10} />
+              <SliderFilledTrack bg="teal.500" />
+            </SliderTrack>
+            <SliderThumb boxSize={6} />
+          </Slider>
         </FormControl>
         <Flex>
           <Spacer />
