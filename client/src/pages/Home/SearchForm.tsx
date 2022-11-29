@@ -58,7 +58,7 @@ const SearchForm = ({ onChange }: Props) => {
   return (
     <Box>
       <Flex>
-        <FormControl>
+        <FormControl mr="1" w="100%">
           <FormLabel>キーワード</FormLabel>
           <Input
             name="keyword"
@@ -67,7 +67,7 @@ const SearchForm = ({ onChange }: Props) => {
             value={form.keyword ?? ''}
           />
         </FormControl>
-        <FormControl>
+        <FormControl maxW="200px" ml="1">
           <FormLabel>完了したかどうか</FormLabel>
           <Select
             name="done"

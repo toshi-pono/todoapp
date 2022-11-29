@@ -1,7 +1,16 @@
 import { Fragment, useCallback, useState } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
-import { Box, Divider, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Divider,
+  Flex,
+  IconButton,
+  Stack,
+  StackDivider,
+  Text,
+  VStack,
+} from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
@@ -130,16 +139,17 @@ const TaskListComponent = () => {
       </Flex>
 
       <Divider />
-      {tasks.tasks.map((task) => (
-        <Fragment key={task.id}>
+      <VStack divider={<StackDivider />} spacing={4}>
+        {tasks.tasks.map((task) => (
           <TaskItem
             deleteHandler={handleDeleteTask}
+            key={task.id}
             task={task}
             toggleHandler={handleToggleTask}
           />
-          <Divider />
-        </Fragment>
-      ))}
+        ))}
+      </VStack>
+      <Divider />
     </Stack>
   )
 }

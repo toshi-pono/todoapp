@@ -32,43 +32,41 @@ const TaskItem = ({ task, toggleHandler, deleteHandler }: Props) => {
     }
   }, [task.deadline])
   return (
-    <>
-      <Flex>
-        <Checkbox
-          colorScheme="orange"
-          isChecked={task.done}
-          ml="2"
-          mr="4"
-          onChange={handleToggle}
-          size="lg"
-        />
-        {task.priority >= 3 ? (
-          <WarningIcon color="teal" mt="1" />
-        ) : (
-          <Box w="16px"></Box>
-        )}
-        <Box
-          color={isOutdated ? 'red' : ''}
-          fontWeight={isOutdated ? 'bold' : undefined}
-          mx="2"
-          w="100%"
-        >
-          <Link to={`/tasks/${task.id}`}>
-            <Heading size="sm">{task.title}</Heading>
-            <div>
-              {isOutdated
-                ? dateToView(new Date(task.deadline))
-                : dateToDeadline(new Date(task.deadline))}
-            </div>
-          </Link>
-        </Box>
-        <IconButton
-          aria-label="delete"
-          icon={<DeleteIcon />}
-          onClick={handleDelete}
-        />
-      </Flex>
-    </>
+    <Flex px="2" w="100%">
+      <Checkbox
+        colorScheme="orange"
+        isChecked={task.done}
+        ml="2"
+        mr="4"
+        onChange={handleToggle}
+        size="lg"
+      />
+      {task.priority >= 3 ? (
+        <WarningIcon color="teal" mt="1" />
+      ) : (
+        <Box w="16px"></Box>
+      )}
+      <Box
+        color={isOutdated ? 'red' : ''}
+        fontWeight={isOutdated ? 'bold' : undefined}
+        mx="2"
+        w="100%"
+      >
+        <Link to={`/tasks/${task.id}`}>
+          <Heading size="sm">{task.title}</Heading>
+          <div>
+            {isOutdated
+              ? dateToView(new Date(task.deadline))
+              : dateToDeadline(new Date(task.deadline))}
+          </div>
+        </Link>
+      </Box>
+      <IconButton
+        aria-label="delete"
+        icon={<DeleteIcon />}
+        onClick={handleDelete}
+      />
+    </Flex>
   )
 }
 

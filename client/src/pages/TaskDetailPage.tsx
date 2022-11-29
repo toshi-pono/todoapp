@@ -19,6 +19,10 @@ import {
   SliderFilledTrack,
   SliderThumb,
   SliderTrack,
+  VStack,
+  Stack,
+  Flex,
+  StackDivider,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useParams } from 'react-router'
@@ -150,81 +154,93 @@ const TaskDetailPage = () => {
           <Link to="#">TaskDetail</Link>
         </BreadcrumbItem>
       </Breadcrumb>
-      <Heading mb="4">Task Detail</Heading>
-      <FormControl>
-        <FormLabel>タイトル</FormLabel>
-        <Input
-          name="title"
-          onChange={handleFormInputChange}
-          placeholder="タイトル"
-          value={form.title}
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel>説明</FormLabel>
-        <Input
-          name="description"
-          onChange={handleFormInputChange}
-          placeholder="説明"
-          value={form.description}
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel>期限</FormLabel>
-        <Input
-          name="deadline"
-          onChange={handleFormInputChange}
-          placeholder="締め切り"
-          type="datetime-local"
-          value={form.deadline}
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel>優先度</FormLabel>
-        <Slider
-          defaultValue={2}
-          max={4}
-          min={0}
-          onChange={handleFormPriorityChange}
-          step={1}
-          value={form.priority}
-        >
-          <SliderTrack bg="teal.100">
-            <Box position="relative" right={10} />
-            <SliderFilledTrack bg="teal.500" />
-          </SliderTrack>
-          <SliderThumb boxSize={6} />
-        </Slider>
-      </FormControl>
-      <FormControl>
-        <FormLabel>完了</FormLabel>
-        <Checkbox isChecked={form.done} onChange={handleFormDoneChange} />
-      </FormControl>
-      <Button mb="4" onClick={handleUpdateTask}>
-        更新
-      </Button>
-      <Divider mx="1" />
-      <Heading size="sm">共有</Heading>
-      <AvatarGroup max={2} size="md">
-        {task.shareList
-          .filter((share) => share.id !== user?.id)
-          .map((share) => (
-            <Avatar key={share.id} name={share.name} />
-          ))}
-      </AvatarGroup>
-      <FormControl isInvalid={shareErrorMessage !== ''}>
-        <FormLabel>共有するユーザー名</FormLabel>
-        <Input
-          name="shareUserName"
-          onChange={handleShareUserChange}
-          placeholder="ユーザー名"
-          value={shareUser}
-        />
-        {shareErrorMessage !== '' && (
-          <FormErrorMessage>{shareErrorMessage}</FormErrorMessage>
-        )}
-      </FormControl>
-      <Button onClick={handleShare}>共有</Button>
+      <Heading mb="4" size="2xl">
+        Task Detail
+      </Heading>
+      <VStack align="stretch" divider={<StackDivider />} spacing="4">
+        <Stack>
+          <Heading size="md">タスクの編集</Heading>
+          <FormControl>
+            <FormLabel mb="0">タイトル</FormLabel>
+            <Input
+              name="title"
+              onChange={handleFormInputChange}
+              placeholder="タイトル"
+              value={form.title}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel mb="0">説明</FormLabel>
+            <Input
+              name="description"
+              onChange={handleFormInputChange}
+              placeholder="説明"
+              value={form.description}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel mb="0">期限</FormLabel>
+            <Input
+              name="deadline"
+              onChange={handleFormInputChange}
+              placeholder="締め切り"
+              type="datetime-local"
+              value={form.deadline}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel mb="3">優先度：{form.priority + 1} / 5</FormLabel>
+            <Box px="5">
+              <Slider
+                defaultValue={2}
+                max={4}
+                min={0}
+                onChange={handleFormPriorityChange}
+                step={1}
+                value={form.priority}
+              >
+                <SliderTrack bg="teal.100">
+                  <Box position="relative" right={10} />
+                  <SliderFilledTrack bg="teal.500" />
+                </SliderTrack>
+                <SliderThumb boxSize={6} />
+              </Slider>
+            </Box>
+          </FormControl>
+          <FormControl>
+            <FormLabel>完了</FormLabel>
+            <Checkbox isChecked={form.done} onChange={handleFormDoneChange} />
+          </FormControl>
+          <Flex justifyContent="right">
+            <Button onClick={handleUpdateTask}>更新</Button>
+          </Flex>
+        </Stack>
+        <Stack>
+          <Heading size="md">共有</Heading>
+          <AvatarGroup max={2} size="md">
+            {task.shareList
+              .filter((share) => share.id !== user?.id)
+              .map((share) => (
+                <Avatar key={share.id} name={share.name} />
+              ))}
+          </AvatarGroup>
+          <FormControl isInvalid={shareErrorMessage !== ''}>
+            <FormLabel>共有するユーザー名</FormLabel>
+            <Input
+              name="shareUserName"
+              onChange={handleShareUserChange}
+              placeholder="ユーザー名"
+              value={shareUser}
+            />
+            {shareErrorMessage !== '' && (
+              <FormErrorMessage>{shareErrorMessage}</FormErrorMessage>
+            )}
+          </FormControl>
+          <Flex justifyContent="right">
+            <Button onClick={handleShare}>共有</Button>
+          </Flex>
+        </Stack>
+      </VStack>
     </PageContainer>
   )
 }
