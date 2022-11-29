@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useParams } from 'react-router'
 import {
   Button,
   FormControl,
@@ -15,13 +14,20 @@ import {
   Avatar,
   Divider,
   FormErrorMessage,
+  Box,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
+import { useParams } from 'react-router'
 import useSWR from 'swr'
 
 import api, { TaskDetail, UpdateTaskRequest } from '/@/libs/apis'
 import PageContainer from '/@/components/layouts/PageContainer'
 import { useAuth } from '/@/libs/auth'
+import { toFormDate } from '/@/libs/date'
 
 const TaskDetailPage = () => {
   const { user } = useAuth()
@@ -37,6 +43,8 @@ const TaskDetailPage = () => {
     title: '',
     description: '',
     done: false,
+    priority: 2,
+    deadline: '',
   })
   const handleFormInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +64,12 @@ const TaskDetailPage = () => {
     },
     []
   )
+  const handleFormPriorityChange = useCallback((val: number) => {
+    setForm((prev) => ({
+      ...prev,
+      priority: val,
+    }))
+  }, [])
 
   const [shareUser, setShareUser] = useState('')
   const [shareErrorMessage, setShareErrorMessage] = useState('')
@@ -94,6 +108,8 @@ const TaskDetailPage = () => {
         title: task.title,
         description: task.description,
         done: task.done,
+        priority: task.priority,
+        deadline: toFormDate(new Date(task.deadline)),
       })
     }
   }, [task])
@@ -104,11 +120,21 @@ const TaskDetailPage = () => {
       title: form.title,
       description: form.description,
       done: form.done,
+      priority: form.priority,
+      deadline: new Date(form.deadline).toISOString(),
     })
     if (res.status === 200) {
       mutate()
     }
-  }, [form.description, form.done, form.title, mutate, task])
+  }, [
+    form.deadline,
+    form.description,
+    form.done,
+    form.priority,
+    form.title,
+    mutate,
+    task,
+  ])
 
   if (!task) {
     return <PageContainer>Loading...</PageContainer>
@@ -142,6 +168,33 @@ const TaskDetailPage = () => {
           placeholder="説明"
           value={form.description}
         />
+      </FormControl>
+      <FormControl>
+        <FormLabel>期限</FormLabel>
+        <Input
+          name="deadline"
+          onChange={handleFormInputChange}
+          placeholder="締め切り"
+          type="datetime-local"
+          value={form.deadline}
+        />
+      </FormControl>
+      <FormControl>
+        <FormLabel>優先度</FormLabel>
+        <Slider
+          defaultValue={2}
+          max={4}
+          min={0}
+          onChange={handleFormPriorityChange}
+          step={1}
+          value={form.priority}
+        >
+          <SliderTrack bg="teal.100">
+            <Box position="relative" right={10} />
+            <SliderFilledTrack bg="teal.500" />
+          </SliderTrack>
+          <SliderThumb boxSize={6} />
+        </Slider>
       </FormControl>
       <FormControl>
         <FormLabel>完了</FormLabel>
