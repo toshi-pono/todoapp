@@ -29,7 +29,7 @@ type Task struct {
 	CreatedAt   time.Time `db:"created_at"`
 }
 
-const task_columns = "id, title, description, is_done, created_at"
+const task_columns = "id, title, description, is_done, created_at, priority, deadline"
 
 type CreateTaskArgs struct {
 	Title       string
