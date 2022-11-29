@@ -12,6 +12,7 @@ import {
   InputRightElement,
   Link as ChakraLink,
   useToast,
+  Flex,
 } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
@@ -84,10 +85,12 @@ const Register = () => {
 
   return (
     <PageContainer>
-      <Heading>Register</Heading>
+      <Heading mb="8" size="2xl">
+        Register
+      </Heading>
       <Stack spacing={4}>
         <FormControl isRequired>
-          <FormLabel>ユーザー名</FormLabel>
+          <FormLabel mb="0">ユーザー名</FormLabel>
           <InputGroup>
             <Input
               name="username"
@@ -98,7 +101,7 @@ const Register = () => {
           </InputGroup>
         </FormControl>
         <FormControl isRequired>
-          <FormLabel>パスワード</FormLabel>
+          <FormLabel mb="0">パスワード</FormLabel>
           <InputGroup>
             <Input
               name="password"
@@ -114,10 +117,12 @@ const Register = () => {
             </InputRightElement>
           </InputGroup>
         </FormControl>
-        <FormControl>
-          <Button onClick={handleRegister}>新規登録</Button>
-        </FormControl>
-        <ChakraLink as={Link} color="teal.500" to="/login">
+        <Flex justifyContent="center">
+          <Button onClick={handleRegister} w="300px">
+            新規登録
+          </Button>
+        </Flex>
+        <ChakraLink as={Link} color="teal.500" textAlign="center" to="/login">
           アカウントをお持ちの方はこちら
         </ChakraLink>
       </Stack>

@@ -12,6 +12,7 @@ import {
   FormLabel,
   InputRightElement,
   Link as ChakraLink,
+  Flex,
 } from '@chakra-ui/react'
 
 import PageContainer from '/@/components/layouts/PageContainer'
@@ -52,10 +53,12 @@ const Login = () => {
   }, [login, loginForm.password, loginForm.username])
   return (
     <PageContainer>
-      <Heading>Login</Heading>
+      <Heading mb="8" size="2xl">
+        Login
+      </Heading>
       <Stack spacing={4}>
         <FormControl isRequired>
-          <FormLabel>ユーザー名</FormLabel>
+          <FormLabel mb="0">ユーザー名</FormLabel>
           <InputGroup>
             <Input
               name="username"
@@ -66,7 +69,7 @@ const Login = () => {
           </InputGroup>
         </FormControl>
         <FormControl isRequired>
-          <FormLabel>パスワード</FormLabel>
+          <FormLabel mb="0">パスワード</FormLabel>
           <InputGroup>
             <Input
               name="password"
@@ -82,10 +85,17 @@ const Login = () => {
             </InputRightElement>
           </InputGroup>
         </FormControl>
-        <FormControl>
-          <Button onClick={handleLogin}>ログイン</Button>
-        </FormControl>
-        <ChakraLink as={Link} color="teal.500" to="/register">
+        <Flex justifyContent="center">
+          <Button onClick={handleLogin} w="300px">
+            ログイン
+          </Button>
+        </Flex>
+        <ChakraLink
+          as={Link}
+          color="teal.500"
+          textAlign="center"
+          to="/register"
+        >
           アカウントを新規作成する
         </ChakraLink>
       </Stack>

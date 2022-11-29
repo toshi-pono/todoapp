@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 import {

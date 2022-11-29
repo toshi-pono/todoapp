@@ -12,7 +12,6 @@ import {
   BreadcrumbItem,
   AvatarGroup,
   Avatar,
-  Divider,
   FormErrorMessage,
   Box,
   Slider,
