@@ -18,3 +18,20 @@ export const dateToView = (date: Date): string => {
     ('0' + d.getMinutes()).slice(-2)
   )
 }
+
+// Time to Deadline
+export const dateToDeadline = (date: Date): string => {
+  const now = new Date()
+  const deadline = new Date(date)
+  const diff = deadline.getTime() - now.getTime()
+
+  return (
+    'あと' +
+    Math.floor(diff / (1000 * 60 * 60 * 24)) +
+    '日' +
+    Math.floor((diff / (1000 * 60 * 60)) % 24) +
+    '時間' +
+    Math.floor((diff / (1000 * 60)) % 60) +
+    '分'
+  )
+}
