@@ -10,8 +10,8 @@ import (
 
 type TasksRepository interface {
 	GetTask(userId uuid.UUID, taskId uuid.UUID) (*Task, error)
-	GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error)
-	SearchTasks(userId uuid.UUID, limit int, offset int, searchQuery SearchTaskArgs) ([]Task, error)
+	GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, int, error)
+	SearchTasks(userId uuid.UUID, limit int, offset int, searchQuery SearchTaskArgs) ([]Task, int, error)
 	CreateTask(userId uuid.UUID, args CreateTaskArgs) (*Task, error)
 	UpdateTask(userId uuid.UUID, taskId uuid.UUID, args UpdateTaskArgs) (*Task, error)
 	DeleteTask(userId uuid.UUID, taskId uuid.UUID) error
@@ -57,22 +57,31 @@ func (repo *SqlxRepository) GetTask(userId uuid.UUID, taskId uuid.UUID) (*Task, 
 }
 
 // GetTasks タスクを取得する
-func (repo *SqlxRepository) GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, error) {
+func (repo *SqlxRepository) GetTasks(userId uuid.UUID, limit int, offset int) ([]Task, int, error) {
 	var tasks []Task
 	query := `SELECT ` + task_columns + ` FROM tasks JOIN ownership ON task_id = id WHERE user_id = ? LIMIT ? OFFSET ?`
 	err := repo.db.Select(&tasks, query, userId, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return tasks, nil
+
+	var count int
+	query = `SELECT COUNT(*) FROM tasks JOIN ownership ON task_id = id WHERE user_id = ?`
+	err = repo.db.Get(&count, query, userId)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return tasks, count, nil
 }
 
 // SearchTasks タスクを検索する
-func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int, searchQuery SearchTaskArgs) ([]Task, error) {
+func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int, searchQuery SearchTaskArgs) ([]Task, int, error) {
 	var tasks []Task
 	var title string
 	var done bool
 	query := `SELECT ` + task_columns + ` FROM tasks JOIN ownership ON task_id = id WHERE user_id = ?`
+	countQuery := `SELECT COUNT(*) FROM tasks JOIN ownership ON task_id = id WHERE user_id = ?`
 
 	// タイトル(keyword)の処理
 	query += ` AND title LIKE ?`
@@ -85,6 +94,7 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 	// 完了状態の処理
 	if searchQuery.Done != nil {
 		query += ` AND is_done = ?`
+		countQuery += ` AND is_done = ?`
 		if (*searchQuery.Done) == "yes" {
 			done = true
 		} else {
@@ -92,15 +102,23 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 		}
 	} else {
 		query += ` AND ?`
+		countQuery += ` AND ?`
 		done = true
 	}
 
 	query += ` LIMIT ? OFFSET ?`
 	err := repo.db.Select(&tasks, query, userId, title, done, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return tasks, nil
+
+	var count int
+	err = repo.db.Get(&count, countQuery, userId, title, done)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return tasks, count, nil
 }
 
 // CreateTask タスクを作成する

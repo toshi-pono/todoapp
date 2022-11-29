@@ -34,7 +34,7 @@ func (h *Handlers) GetTasks(c *gin.Context, params openapi.GetTasksParams) {
 	}
 
 	// キーワード検索 or 完了フラグ検索
-	tasks, err := h.Repo.SearchTasks(userId, limit, offset, model.SearchTaskArgs{
+	tasks, total, err := h.Repo.SearchTasks(userId, limit, offset, model.SearchTaskArgs{
 		Title: params.Keyword,
 		Done:  params.Done,
 	})
@@ -43,7 +43,10 @@ func (h *Handlers) GetTasks(c *gin.Context, params openapi.GetTasksParams) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, convertTaskList(tasks))
+	c.JSON(http.StatusOK, openapi.TaskList{
+		Tasks: convertTaskList(tasks),
+		Total: total,
+	})
 }
 
 // タスクを作成
