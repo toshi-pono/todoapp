@@ -10,7 +10,7 @@ import {
   Button,
 } from '@chakra-ui/react'
 
-import TaskList from './TaskList'
+import TaskListComponent from './TaskList'
 
 import PageContainer from '/@/components/layouts/PageContainer'
 
@@ -30,7 +30,7 @@ const Home = () => {
             新規作成
           </Button>
         </Flex>
-        <TaskList />
+        <TaskListComponent />
       </Stack>
     </PageContainer>
   )

@@ -1,10 +1,11 @@
 import { Fragment, useCallback, useState } from 'react'
 
-import { Divider, Stack } from '@chakra-ui/react'
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
+import { Box, Divider, Flex, IconButton, Stack, Text } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import useSWR from 'swr'
 
-import api, { Task } from '/@/libs/apis'
+import api, { TaskList, Task } from '/@/libs/apis'
 
 import SearchForm, { SearchArgs } from './SearchForm'
 import TaskItem from './TaskItem'
@@ -16,11 +17,14 @@ interface TaskArgs {
   done?: string
 }
 
-const TaskList = () => {
+const MAX_ENTRIES = 10
+
+const TaskListComponent = () => {
   const [taskArgs, setTaskArgs] = useState<TaskArgs>({
-    limit: 10,
+    limit: MAX_ENTRIES,
     offset: 0,
   })
+  const [page, setPage] = useState(1)
 
   const tasksFetcher = (request: { url: string; args: TaskArgs }) => {
     return api.tasks
@@ -32,9 +36,25 @@ const TaskList = () => {
       )
       .then((res) => res.data)
   }
-  const { data: tasks, mutate } = useSWR<Task[], AxiosError>(
+  const { data: tasks, mutate } = useSWR<TaskList, AxiosError>(
     { url: '/tasks', args: taskArgs },
     tasksFetcher
+  )
+  const handlePageChange = useCallback(
+    (shift: number) => {
+      if (tasks === undefined) return
+      setPage((prev) => {
+        const newPage = prev + shift
+        if (newPage < 1) return 1
+        if (newPage > Math.ceil(tasks?.total / MAX_ENTRIES)) return prev
+        return newPage
+      })
+      setTaskArgs((prev) => ({
+        ...prev,
+        offset: (page + shift - 1) * MAX_ENTRIES,
+      }))
+    },
+    [page, tasks]
   )
 
   const handleSearchChange = useCallback(
@@ -85,8 +105,33 @@ const TaskList = () => {
   return (
     <Stack spacing={4}>
       <SearchForm onChange={handleSearchChange} />
+      <Flex>
+        <Text mr="2">
+          {tasks.total > MAX_ENTRIES ? MAX_ENTRIES : tasks.total}/{tasks.total}
+          件 ({page}ページ目)
+        </Text>
+        <Divider orientation="vertical" />
+        {tasks.total > MAX_ENTRIES && (
+          <Box ml="2">
+            <IconButton
+              aria-label="前のページ"
+              icon={<ChevronLeftIcon />}
+              mr="1"
+              onClick={() => handlePageChange(-1)}
+              size="sm"
+            />
+            <IconButton
+              aria-label="次のページ"
+              icon={<ChevronRightIcon />}
+              onClick={() => handlePageChange(1)}
+              size="sm"
+            />
+          </Box>
+        )}
+      </Flex>
+
       <Divider />
-      {tasks.map((task) => (
+      {tasks.tasks.map((task) => (
         <Fragment key={task.id}>
           <TaskItem
             deleteHandler={handleDeleteTask}
@@ -100,4 +145,4 @@ const TaskList = () => {
   )
 }
 
-export default TaskList
+export default TaskListComponent

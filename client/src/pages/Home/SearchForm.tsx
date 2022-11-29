@@ -80,7 +80,11 @@ const SearchForm = ({ onChange }: Props) => {
           </Select>
         </FormControl>
       </Flex>
-      <Button onClick={searchHandler}>検索</Button>
+      <Flex justifyContent="right">
+        <Button mt="2" onClick={searchHandler}>
+          検索
+        </Button>
+      </Flex>
     </Box>
   )
 }
