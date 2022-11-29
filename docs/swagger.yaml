@@ -371,9 +371,18 @@ components:
         description:
           type: string
           description: タスク説明
+        priority:
+          type: integer
+          description: 優先度
+        deadline:
+          type: string
+          description: 締切
+          format: date-time
       required:
         - title
         - description
+        - priority
+        - deadline
     UpdateTaskRequest:
       title: UpdateTaskRequest
       type: object
@@ -387,10 +396,19 @@ components:
         done:
           type: boolean
           description: 完了フラグ
+        priority:
+          type: integer
+          description: 優先度
+        deadline:
+          type: string
+          description: 締切
+          format: date-time
       required:
         - title
         - description
         - done
+        - priority
+        - deadline
     ShareTaskRequest:
       title: ShareTaskRequest
       type: object
