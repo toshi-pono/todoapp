@@ -78,7 +78,7 @@ const User = () => {
     <>
       <PageContainer>
         <Heading mb="8" size="2xl">
-          マイページ
+          MyPage
         </Heading>
         <VStack align="stretch" divider={<StackDivider />} spacing={4}>
           <UserEdit />
@@ -109,9 +109,9 @@ const User = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              <Text>本当にアカウントを削除しますか？</Text>
+              <Text mb="1">本当にアカウントを削除しますか？</Text>
               <FormControl isRequired>
-                <FormLabel>パスワード</FormLabel>
+                <FormLabel mb="0">パスワード</FormLabel>
                 <Input
                   onChange={handlePasswordChange}
                   placeholder="パスワード"
