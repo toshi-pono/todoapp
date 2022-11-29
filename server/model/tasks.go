@@ -134,7 +134,7 @@ func (repo *SqlxRepository) CreateTask(userId uuid.UUID, args CreateTaskArgs) (*
 	var task Task
 	taskId := uuid.New()
 	tx := repo.db.MustBegin()
-	_, err := tx.Exec("INSERT INTO tasks (id, title, description, priority, deadline) VALUES (?, ?, ?)", taskId, args.Title, args.Description, args.Priority, args.Deadline)
+	_, err := tx.Exec("INSERT INTO tasks (id, title, description, priority, deadline) VALUES (?, ?, ?, ?, ?)", taskId, args.Title, args.Description, args.Priority, args.Deadline)
 	if err != nil {
 		tx.Rollback()
 		return nil, err

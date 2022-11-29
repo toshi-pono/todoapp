@@ -71,6 +71,7 @@ func (h *Handlers) CreateTask(c *gin.Context) {
 		Deadline:    args.Deadline,
 	})
 	if err != nil {
+		log.Println(err)
 		c.Status(http.StatusInternalServerError)
 		return
 	}
