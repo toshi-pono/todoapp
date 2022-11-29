@@ -333,6 +333,8 @@ components:
         - description
         - done
         - createdAt
+        - priority
+        - deadline
     TaskDetail:
       title: TaskDetail
       allOf:
