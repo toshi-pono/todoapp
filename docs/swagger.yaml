@@ -316,6 +316,13 @@ components:
         done:
           type: boolean
           description: 完了フラグ
+        priority:
+          type: integer
+          description: 優先度
+        deadline:
+          type: string
+          description: 締切
+          format: date-time
         createdAt:
           type: string
           description: 作成日時
