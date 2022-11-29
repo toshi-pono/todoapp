@@ -47,6 +47,7 @@ const Login = () => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target
       setLoginForm({ ...loginForm, [name]: value })
+      setErrorMessage('')
     },
     [loginForm]
   )

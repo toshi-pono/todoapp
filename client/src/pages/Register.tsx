@@ -49,6 +49,7 @@ const Register = () => {
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target
       setRegisterForm((prev) => ({ ...prev, [name]: value }))
+      setErrorMessage('')
     },
     []
   )
