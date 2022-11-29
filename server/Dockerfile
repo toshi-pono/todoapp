@@ -8,5 +8,6 @@ WORKDIR ${WORKSPACE}
 
 ADD . ${WORKSPACE}
 
+RUN go generate ./handler/api.go
 RUN go mod download
 RUN go mod tidy
