@@ -107,8 +107,7 @@ const TaskListComponent = () => {
       <SearchForm onChange={handleSearchChange} />
       <Flex>
         <Text mr="2">
-          {tasks.total > MAX_ENTRIES ? MAX_ENTRIES : tasks.total}/{tasks.total}
-          件 ({page}ページ目)
+          {tasks.tasks.length}/{tasks.total}件 ({page}ページ目)
         </Text>
         <Divider orientation="vertical" />
         {tasks.total > MAX_ENTRIES && (
