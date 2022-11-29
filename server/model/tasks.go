@@ -113,7 +113,7 @@ func (repo *SqlxRepository) SearchTasks(userId uuid.UUID, limit int, offset int,
 		done = true
 	}
 
-	query += ` LIMIT ? OFFSET ?`
+	query += ` ORDER BY deadline ASC LIMIT ? OFFSET ?`
 	err := repo.db.Select(&tasks, query, userId, title, done, limit, offset)
 	if err != nil {
 		return nil, 0, err

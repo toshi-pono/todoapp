@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Flex, Checkbox, IconButton, Box } from '@chakra-ui/react'
-import { DeleteIcon } from '@chakra-ui/icons'
+import { DeleteIcon, WarningIcon } from '@chakra-ui/icons'
 
 import { Task } from '/@/libs/apis'
+import { dateToView } from '/@/libs/date'
 
 interface Props {
   task: Task
@@ -18,6 +20,17 @@ const TaskItem = ({ task, toggleHandler, deleteHandler }: Props) => {
   const handleDelete = () => {
     deleteHandler(task.id)
   }
+
+  const [isOutdated, setIsOutdated] = useState(false)
+  useEffect(() => {
+    const now = new Date()
+    const deadline = new Date(task.deadline)
+    if (deadline < now) {
+      setIsOutdated(true)
+    } else {
+      setIsOutdated(false)
+    }
+  }, [task.deadline])
   return (
     <>
       <Flex>
@@ -29,10 +42,20 @@ const TaskItem = ({ task, toggleHandler, deleteHandler }: Props) => {
           onChange={handleToggle}
           size="lg"
         />
-        <Box w="100%">
+        {task.priority >= 3 ? (
+          <WarningIcon color="teal" mt="1" />
+        ) : (
+          <Box w="16px"></Box>
+        )}
+        <Box
+          color={isOutdated ? 'red' : ''}
+          fontWeight={isOutdated ? 'bold' : undefined}
+          mx="2"
+          w="100%"
+        >
           <Link to={`/tasks/${task.id}`}>
             <div>{task.title}</div>
-            <div>{task.description}</div>
+            <div>{dateToView(new Date(task.deadline))}</div>
           </Link>
         </Box>
         <IconButton
